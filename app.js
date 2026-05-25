@@ -1331,6 +1331,8 @@ My Collapsed Sigil: ${activeHouse.sigilData[collapsedSigilIndex].name}
 My Cryptographic Seed: ${seedCode}
 My Fulfillment Data Hook: ${fullFulfillmentCode}
 
+⚡ [Tip: Drag and drop or copy-paste your downloaded Blexxing file directly into this email to share the pulsing animation!]
+
 Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/`
         );
         emailGifLink.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
