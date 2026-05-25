@@ -1563,24 +1563,12 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
         timestamp: new Date()
       };
 
-      // 1. Save to Cloud Firestore spreadsheet database ledger
+      // 1. Save securely to Cloud Firestore spreadsheet database ledger
       addDoc(collection(db, "physical_orders"), orderData).then((docRef) => {
         console.log("Physical order securely saved to Firestore spreadsheet database with ID:", docRef.id);
-        
-        // 2. Generate and download a local CSV spreadsheet sheet file!
-        const csvHeaders = "NAME,STREET_ADDRESS,CITY,STATE,POSTAL_CODE,COUNTRY,SEED_CODE,FULFILLMENT_CODE,SECURE_HASH,HOUSE_REALM,TIMESTAMP_UTC\n";
-        const csvRow = `"${orderData.name.replace(/"/g, '""')}","${orderData.address.replace(/"/g, '""')}","${orderData.city.replace(/"/g, '""')}","${orderData.state.replace(/"/g, '""')}","${orderData.zip.replace(/"/g, '""')}","${orderData.country.replace(/"/g, '""')}","${orderData.seed}","${orderData.fulfillmentCode}","${orderData.hash}","${orderData.house.toUpperCase()}","${orderData.timestamp.toISOString()}"\n`;
-        const csvBlob = new Blob([csvHeaders + csvRow], { type: "text/csv;charset=utf-8;" });
-        const csvUrl = URL.createObjectURL(csvBlob);
-        
-        const downloadLink = document.createElement("a");
-        downloadLink.setAttribute("href", csvUrl);
-        downloadLink.setAttribute("download", `BLEXX_SHIPMENT_${orderData.seed}.csv`);
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
+        appendLog(`FIRESTORE_DB // PHYSICAL ORDER REGISTERED. ID: ${docRef.id.substring(0, 8)}...`, "cyan-text");
 
-        alert("PHYSICAL SHIPMENT CONFIRMED!\n\nOrder saved to Firestore database ledger & downloaded as a CSV spreadsheet.");
+        alert("PHYSICAL SHIPMENT CONFIRMED!\n\nYour shipping coordinates have been securely saved to the database spreadsheet ledger.");
         
         // Reset form and close
         physicalForm.reset();
@@ -1588,6 +1576,48 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
       }).catch((err) => {
         console.error("Firestore Physical Order Error:", err);
         alert("ERROR: Could not establish connection to the database. Order not saved.");
+      });
+    });
+  }
+
+  // --- Admin Combined CSV Spreadsheet Exporter ---
+  const adminExportBtn = document.getElementById('admin-export-btn');
+  if (adminExportBtn) {
+    adminExportBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      appendLog("ADMIN // RETRIEVING ALL PHYSICAL SHIPPINGS FROM LEDGER...");
+      
+      getDocs(collection(db, "physical_orders")).then((querySnapshot) => {
+        if (querySnapshot.empty) {
+          alert("No shipping orders found in the database yet!");
+          appendLog("ADMIN // RETRIEVAL COMPLETE: 0 ORDERS FOUND", "magenta-text");
+          return;
+        }
+        
+        // Compile all database documents into a single, combined CSV spreadsheet
+        let csvContent = "NAME,STREET_ADDRESS,CITY,STATE,POSTAL_CODE,COUNTRY,SEED_CODE,FULFILLMENT_CODE,SECURE_HASH,HOUSE_REALM,TIMESTAMP_UTC\n";
+        
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+          const tstamp = data.timestamp ? new Date(data.timestamp.seconds * 1000).toISOString() : 'RECENT';
+          csvContent += `"${data.name.replace(/"/g, '""')}","${data.address.replace(/"/g, '""')}","${data.city.replace(/"/g, '""')}","${data.state.replace(/"/g, '""')}","${data.zip.replace(/"/g, '""')}","${data.country.replace(/"/g, '""')}","${data.seed}","${data.fulfillmentCode}","${data.hash}","${data.house.toUpperCase()}","${tstamp}"\n`;
+        });
+        
+        const csvBlob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const csvUrl = URL.createObjectURL(csvBlob);
+        
+        const downloadLink = document.createElement("a");
+        downloadLink.setAttribute("href", csvUrl);
+        downloadLink.setAttribute("download", "BLEXX_PHYSICAL_ORDERS_DATABASE.csv");
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        
+        appendLog(`ADMIN // COMPILED ${querySnapshot.size} ORDERS INTO CSV SPREADSHEET`, "cyan-text");
+      }).catch(err => {
+        console.error("Admin ledger export failed:", err);
+        alert("Failed to retrieve orders from database ledger.");
       });
     });
   }
