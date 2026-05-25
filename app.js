@@ -1495,7 +1495,7 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const card = document.createElement('div');
-        const houseColorClass = data.house === 'chance' ? 'cyan-text' : data.house === 'manifestation' ? 'amber-text' : 'magenta-text';
+        const houseColorClass = data.house === 'chance' ? 'chance-text' : data.house === 'manifestation' ? 'amber-text' : 'magenta-text';
         const houseAccentColor = data.house === 'chance' ? '#00f3ff' : data.house === 'manifestation' ? '#ffb700' : '#ff007f';
         
         card.className = 'feed-card glass-sub-panel';

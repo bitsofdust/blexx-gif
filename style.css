@@ -778,6 +778,11 @@ body {
   font-size: 0.65rem;
 }
 
+.chance-text {
+  color: #00f3ff !important;
+  text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+}
+
 .amber-text {
   color: #ffb700 !important;
   text-shadow: 0 0 10px rgba(255, 183, 0, 0.3);
