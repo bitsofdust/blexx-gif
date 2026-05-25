@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const HOUSE_CONFIG = {
     chance: {
       name: "CHANCE",
-      title: "TRIANGLE HOUSE OF CHANCE",
+      title: "HOUSE OF CHANCE",
       themeClass: "house-chance",
       colorGlow: "#00f3ff",
       seedPrefix: "BX-CHNC",
@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     manifestation: {
       name: "MANIFESTATION",
-      title: "CIRCLE HOUSE OF MANIFESTATION",
+      title: "HOUSE OF MANIFESTATION",
       themeClass: "house-manifestation",
       colorGlow: "#ffb700",
       seedPrefix: "BX-MNFS",
@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     devotion: {
       name: "DEVOTION",
-      title: "SQUARE HOUSE OF DEVOTION",
+      title: "HOUSE OF DEVOTION",
       themeClass: "house-devotion",
       colorGlow: "#ff007f",
       seedPrefix: "BX-DVTN",
