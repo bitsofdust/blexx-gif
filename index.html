@@ -177,6 +177,10 @@
               <span class="btn-text">EMAIL BLEXXING</span>
               <span class="btn-bracket font-mono">[SHARE]</span>
             </a>
+            <button id="physical-btn" class="cyber-btn action-glow text-cyan">
+              <span class="btn-text">CREATE PHYSICAL</span>
+              <span class="btn-bracket font-mono">[SHIP]</span>
+            </button>
             <button id="export-back-btn" class="cyber-btn outline-btn font-mono">
               BACK TO RECEIPT
             </button>
@@ -201,7 +205,60 @@
       <div class="footer-right">© PROJECT BLEXX // ELECTROMAGNETIC UNCERTAINTY IS VALUE</div>
     </footer>
 
-  </div>
+  <!-- Physical Shipment Modal Pop-up -->
+  <dialog id="physical-modal" class="glass-panel physical-modal">
+    <div class="modal-header">
+      <h2 class="card-title font-mono">// PHYSICAL SIGIL SHIPMENT</h2>
+      <button id="close-modal-btn" class="close-btn font-mono">&times;</button>
+    </div>
+    <form id="physical-form" method="dialog" class="modal-form font-mono">
+      <p class="modal-intro font-sans">
+        Enter your shipping coordinates to manifest this digital Blexxing into a premium physical artifact.
+      </p>
+      
+      <!-- Input Groups -->
+      <div class="form-group">
+        <label for="ship-name">FULL NAME</label>
+        <input type="text" id="ship-name" required placeholder="SOPHIA LOVELACE" autocomplete="name">
+      </div>
+      
+      <div class="form-group">
+        <label for="ship-address">STREET ADDRESS</label>
+        <input type="text" id="ship-address" required placeholder="42 QUANTUM DRIVE" autocomplete="street-address">
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group flex-2">
+          <label for="ship-city">CITY</label>
+          <input type="text" id="ship-city" required placeholder="ENTROPY VALLEY" autocomplete="address-level2">
+        </div>
+        <div class="form-group flex-1">
+          <label for="ship-state">STATE / REG</label>
+          <input type="text" id="ship-state" required placeholder="CA" autocomplete="address-level1">
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="ship-zip">POSTAL CODE</label>
+          <input type="text" id="ship-zip" required placeholder="90210" autocomplete="postal-code">
+        </div>
+        <div class="form-group flex-1">
+          <label for="ship-country">COUNTRY</label>
+          <input type="text" id="ship-country" required placeholder="UNITED STATES" autocomplete="country-name">
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button type="submit" id="submit-shipment-btn" class="cyber-btn action-glow text-green">
+          CONFIRM ORDER
+        </button>
+        <button type="button" id="cancel-shipment-btn" class="cyber-btn outline-btn">
+          CANCEL
+        </button>
+      </div>
+    </form>
+  </dialog>
 
   <script type="module" src="app.js"></script>
 </body>

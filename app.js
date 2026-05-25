@@ -69,6 +69,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const gifPreview = document.getElementById('gif-preview');
   const downloadGifLink = document.getElementById('download-gif-link');
   const emailGifLink = document.getElementById('email-gif-link');
+  
+  const btnPhysical = document.getElementById('physical-btn');
+  const physicalModal = document.getElementById('physical-modal');
+  const closeModalBtn = document.getElementById('close-modal-btn');
+  const cancelShipmentBtn = document.getElementById('cancel-shipment-btn');
+  const physicalForm = document.getElementById('physical-form');
 
   // --- Constants & Config ---
   const CANVAS_WIDTH = 500;
@@ -1523,6 +1529,66 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
       if (feedContainer) {
         feedContainer.innerHTML = '<div class="feed-placeholder font-mono">SECURE ARCHIVE STORAGE ACTIVE. RETRIEVAL PROTOCOLS STANDBY.</div>';
       }
+    });
+  }
+
+  // --- Physical Shipment Modal Actions ---
+  if (btnPhysical && physicalModal) {
+    btnPhysical.addEventListener('click', () => {
+      physicalModal.showModal();
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+      physicalModal.close();
+    });
+
+    cancelShipmentBtn.addEventListener('click', () => {
+      physicalModal.close();
+    });
+
+    physicalForm.addEventListener('submit', (e) => {
+      e.preventDefault(); // Intercept method="dialog" submit to write data first
+
+      const orderData = {
+        name: document.getElementById('ship-name').value,
+        address: document.getElementById('ship-address').value,
+        city: document.getElementById('ship-city').value,
+        state: document.getElementById('ship-state').value,
+        zip: document.getElementById('ship-zip').value,
+        country: document.getElementById('ship-country').value,
+        seed: seedCode,
+        fulfillmentCode: fullFulfillmentCode,
+        hash: fullSecureHash,
+        house: currentHouse,
+        timestamp: new Date()
+      };
+
+      // 1. Save to Cloud Firestore spreadsheet database ledger
+      addDoc(collection(db, "physical_orders"), orderData).then((docRef) => {
+        console.log("Physical order securely saved to Firestore spreadsheet database with ID:", docRef.id);
+        
+        // 2. Generate and download a local CSV spreadsheet sheet file!
+        const csvHeaders = "NAME,STREET_ADDRESS,CITY,STATE,POSTAL_CODE,COUNTRY,SEED_CODE,FULFILLMENT_CODE,SECURE_HASH,HOUSE_REALM,TIMESTAMP_UTC\n";
+        const csvRow = `"${orderData.name.replace(/"/g, '""')}","${orderData.address.replace(/"/g, '""')}","${orderData.city.replace(/"/g, '""')}","${orderData.state.replace(/"/g, '""')}","${orderData.zip.replace(/"/g, '""')}","${orderData.country.replace(/"/g, '""')}","${orderData.seed}","${orderData.fulfillmentCode}","${orderData.hash}","${orderData.house.toUpperCase()}","${orderData.timestamp.toISOString()}"\n`;
+        const csvBlob = new Blob([csvHeaders + csvRow], { type: "text/csv;charset=utf-8;" });
+        const csvUrl = URL.createObjectURL(csvBlob);
+        
+        const downloadLink = document.createElement("a");
+        downloadLink.setAttribute("href", csvUrl);
+        downloadLink.setAttribute("download", `BLEXX_SHIPMENT_${orderData.seed}.csv`);
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+        alert("PHYSICAL SHIPMENT CONFIRMED!\n\nOrder saved to Firestore database ledger & downloaded as a CSV spreadsheet.");
+        
+        // Reset form and close
+        physicalForm.reset();
+        physicalModal.close();
+      }).catch((err) => {
+        console.error("Firestore Physical Order Error:", err);
+        alert("ERROR: Could not establish connection to the database. Order not saved.");
+      });
     });
   }
 
