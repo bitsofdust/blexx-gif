@@ -379,6 +379,166 @@ document.addEventListener('DOMContentLoaded', () => {
     targetCtx.fill();
     resetGlow(targetCtx);
   }
+  /**
+   * Generates procedural intermediate triangle variations for visual complexity
+   */
+  function drawEntropyVariation(targetCtx, variantIndex, scale = 1, t = 0) {
+    const cx = CENTER_X;
+    const cy = CENTER_Y + 15;
+    const R = 120 * scale;
+    const sin60 = Math.sin(Math.PI / 3);
+    const cos60 = Math.cos(Math.PI / 3);
+    
+    targetCtx.lineWidth = 2.5;
+    targetCtx.lineCap = 'round';
+    targetCtx.lineJoin = 'round';
+    
+    if (variantIndex === 0) {
+      // Nested Orbit (Double Concentric Triangles rotating in opposite directions)
+      const rOuter = R * 1.15;
+      const rInner = R * 0.7;
+      const rotOuter = t * 0.015;
+      const rotInner = -t * 0.025;
+      
+      // Outer rotating triangle
+      targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+      targetCtx.beginPath();
+      for (let i = 0; i < 3; i++) {
+        const a = rotOuter + (i * Math.PI * 2) / 3 - Math.PI / 2;
+        const x = cx + Math.cos(a) * rOuter;
+        const y = cy + Math.sin(a) * rOuter;
+        if (i === 0) targetCtx.moveTo(x, y);
+        else targetCtx.lineTo(x, y);
+      }
+      targetCtx.closePath();
+      targetCtx.stroke();
+      
+      // Inner rotating triangle
+      targetCtx.strokeStyle = 'rgba(0, 243, 255, 0.7)';
+      setGlow(targetCtx, '#00f3ff', 8);
+      targetCtx.beginPath();
+      for (let i = 0; i < 3; i++) {
+        const a = rotInner + (i * Math.PI * 2) / 3 - Math.PI / 2;
+        const x = cx + Math.cos(a) * rInner;
+        const y = cy + Math.sin(a) * rInner;
+        if (i === 0) targetCtx.moveTo(x, y);
+        else targetCtx.lineTo(x, y);
+      }
+      targetCtx.closePath();
+      targetCtx.stroke();
+      resetGlow(targetCtx);
+      
+    } else if (variantIndex === 1) {
+      // Dotted Matrix / Node Grid Triangle
+      const x1 = cx;
+      const y1 = cy - R;
+      const x2 = cx + R * sin60;
+      const y2 = cy + R * cos60;
+      const x3 = cx - R * sin60;
+      const y3 = cy + R * cos60;
+      
+      targetCtx.fillStyle = '#00f3ff';
+      setGlow(targetCtx, '#00f3ff', 8);
+      
+      // Function to draw dotted line
+      const drawDottedLine = (sx, sy, ex, ey, dots = 10) => {
+        for (let i = 0; i <= dots; i++) {
+          const px = sx + (ex - sx) * (i / dots);
+          const py = sy + (ey - sy) * (i / dots);
+          targetCtx.beginPath();
+          targetCtx.arc(px, py, 2.5, 0, Math.PI * 2);
+          targetCtx.fill();
+        }
+      };
+      
+      drawDottedLine(x1, y1, x2, y2);
+      drawDottedLine(x2, y2, x3, y3);
+      drawDottedLine(x3, y3, x1, y1);
+      resetGlow(targetCtx);
+      
+      // Draw target circles on vertices
+      targetCtx.strokeStyle = '#ffffff';
+      targetCtx.lineWidth = 1.5;
+      [ {x:x1, y:y1}, {x:x2, y:y2}, {x:x3, y:y3} ].forEach(vertex => {
+        targetCtx.beginPath();
+        targetCtx.arc(vertex.x, vertex.y, 8, 0, Math.PI * 2);
+        targetCtx.stroke();
+      });
+      
+    } else if (variantIndex === 2) {
+      // Morphing Axis Split (Dynamic Vertex Wobble)
+      const wobbleX = Math.sin(t * 0.08) * 16;
+      const wobbleY = Math.cos(t * 0.06) * 10;
+      
+      const x1 = cx + wobbleX;
+      const y1 = cy - R + wobbleY;
+      const x2 = cx + R * sin60;
+      const y2 = cy + R * cos60;
+      const x3 = cx - R * sin60;
+      const y3 = cy + R * cos60;
+      
+      targetCtx.strokeStyle = '#ffffff';
+      targetCtx.beginPath();
+      targetCtx.moveTo(x1, y1);
+      targetCtx.lineTo(x2, y2);
+      targetCtx.lineTo(x3, y3);
+      targetCtx.closePath();
+      targetCtx.stroke();
+      
+      // Center dividing coordinate axis line
+      targetCtx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
+      targetCtx.setLineDash([2, 5]);
+      targetCtx.beginPath();
+      targetCtx.moveTo(cx, cy - R - 10);
+      targetCtx.lineTo(cx, cy + R + 10);
+      targetCtx.stroke();
+      targetCtx.setLineDash([]);
+      
+    } else if (variantIndex === 3) {
+      // Shattered Frame (Missing side and floating pieces)
+      const x1 = cx;
+      const y1 = cy - R;
+      const x2 = cx + R * sin60;
+      const y2 = cy + R * cos60;
+      const x3 = cx - R * sin60;
+      const y3 = cy + R * cos60;
+      
+      targetCtx.strokeStyle = '#ffffff';
+      
+      // Draw left side
+      targetCtx.beginPath();
+      targetCtx.moveTo(x1, y1);
+      targetCtx.lineTo(x3, y3);
+      targetCtx.stroke();
+      
+      // Draw right side
+      targetCtx.beginPath();
+      targetCtx.moveTo(x1, y1);
+      targetCtx.lineTo(x2, y2);
+      targetCtx.stroke();
+      
+      // Draw incomplete bottom ticks instead of bottom line
+      targetCtx.strokeStyle = 'rgba(0, 243, 255, 0.55)';
+      setGlow(targetCtx, '#00f3ff', 6);
+      const numTicks = 6;
+      for (let i = 0; i <= numTicks; i++) {
+        const px = x3 + (x2 - x3) * (i / numTicks);
+        targetCtx.beginPath();
+        targetCtx.moveTo(px, y3 - 4);
+        targetCtx.lineTo(px, y3 + 4);
+        targetCtx.stroke();
+      }
+      resetGlow(targetCtx);
+      
+      // Floating square tech pieces around the void
+      targetCtx.fillStyle = '#ffffff';
+      for (let i = 0; i < 4; i++) {
+        const px = x3 + (x2 - x3) * ((i + 1) / 5) + Math.sin(t * 0.1 + i) * 5;
+        const py = y3 + 12 + Math.cos(t * 0.1 + i) * 4;
+        targetCtx.fillRect(px - 2, py - 2, 4, 4);
+      }
+    }
+  }
 
   /**
    * Glitch Distortion Effect
@@ -449,10 +609,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (isCollapsing) {
       // High-speed visual chaos cycle during collapse
-      const tempState = Math.floor(Math.random() * 3);
+      const tempState = Math.floor(Math.random() * 7); // 0-2: core sigils, 3-6: variations
       if (tempState === 0) drawBanish(ctx, 1.05, time);
       else if (tempState === 1) drawRisk(ctx, 1.05, time);
-      else drawReceive(ctx, 1.05, time);
+      else if (tempState === 2) drawReceive(ctx, 1.05, time);
+      else drawEntropyVariation(ctx, tempState - 3, 1.05, time);
       
       drawGlitchDistortion(ctx, time);
       
@@ -474,37 +635,55 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
     } else {
-      // Normal Loop State Routing
-      // Loop cycle timeline configuration
-      const totalCycleDuration = 3 * LOOP_TIMINGS.stateDuration + 3 * LOOP_TIMINGS.glitchDuration;
+      // Normal Loop State Routing (10-Phase High-Tempo Visual Cycle)
+      const totalCycleDuration = 5 * LOOP_TIMINGS.stateDuration + 5 * LOOP_TIMINGS.glitchDuration;
       const currentTimeMs = (Date.now()) % totalCycleDuration;
 
-      // Determine which state segment we are currently in
-      let accumulatedTime = 0;
+      let acc = 0;
 
-      // State 01: BANISH
+      // Phase 01: Core BANISH
       if (currentTimeMs < LOOP_TIMINGS.stateDuration) {
         drawBanish(ctx, 1.0, time);
       } 
-      // Glitch 1
-      else if (currentTimeMs < (accumulatedTime = LOOP_TIMINGS.stateDuration + LOOP_TIMINGS.glitchDuration)) {
+      // Phase 02: Core BANISH + Glitch
+      else if (currentTimeMs < (acc = LOOP_TIMINGS.stateDuration + LOOP_TIMINGS.glitchDuration)) {
         drawBanish(ctx, 1.0, time);
         drawGlitchDistortion(ctx, time);
       }
-      // State 02: RISK
-      else if (currentTimeMs < (accumulatedTime += LOOP_TIMINGS.stateDuration)) {
+      // Phase 03: Intermediate Variation 0 (Nested Orbit)
+      else if (currentTimeMs < (acc += LOOP_TIMINGS.stateDuration)) {
+        drawEntropyVariation(ctx, 0, 1.0, time);
+      }
+      // Phase 04: Intermediate Variation 0 + Glitch
+      else if (currentTimeMs < (acc += LOOP_TIMINGS.glitchDuration)) {
+        drawEntropyVariation(ctx, 0, 1.0, time);
+        drawGlitchDistortion(ctx, time);
+      }
+      // Phase 05: Core RISK
+      else if (currentTimeMs < (acc += LOOP_TIMINGS.stateDuration)) {
         drawRisk(ctx, 1.0, time);
       }
-      // Glitch 2
-      else if (currentTimeMs < (accumulatedTime += LOOP_TIMINGS.glitchDuration)) {
+      // Phase 06: Core RISK + Glitch
+      else if (currentTimeMs < (acc += LOOP_TIMINGS.glitchDuration)) {
         drawRisk(ctx, 1.0, time);
         drawGlitchDistortion(ctx, time);
       }
-      // State 03: RECEIVE
-      else if (currentTimeMs < (accumulatedTime += LOOP_TIMINGS.stateDuration)) {
+      // Phase 07: Dynamic intermediate variations 1, 2, 3 (Grid / Morph / Shattered)
+      else if (currentTimeMs < (acc += LOOP_TIMINGS.stateDuration)) {
+        const variantCycle = (Math.floor(time / 15) % 3) + 1; // Cycle through variations 1, 2, 3
+        drawEntropyVariation(ctx, variantCycle, 1.0, time);
+      }
+      // Phase 08: Dynamic intermediate variations + Glitch
+      else if (currentTimeMs < (acc += LOOP_TIMINGS.glitchDuration)) {
+        const variantCycle = (Math.floor(time / 15) % 3) + 1;
+        drawEntropyVariation(ctx, variantCycle, 1.0, time);
+        drawGlitchDistortion(ctx, time);
+      }
+      // Phase 09: Core RECEIVE
+      else if (currentTimeMs < (acc += LOOP_TIMINGS.stateDuration)) {
         drawReceive(ctx, 1.0, time);
       }
-      // Glitch 3
+      // Phase 10: Core RECEIVE + Glitch
       else {
         drawReceive(ctx, 1.0, time);
         drawGlitchDistortion(ctx, time);
