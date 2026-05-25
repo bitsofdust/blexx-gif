@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
       colorGlow: "#00f3ff",
       seedPrefix: "BX-CHNC",
       inviteQuote: `"The door is never where you left it. In the House of Chance, we do not build paths; we step into the wind."`,
-      inviteInstruction: `Stop measuring the distance. Release your grip on the "how" and the "when." To capture your digital Blexxing, initiate the collapse vector below.`,
+      inviteInstruction: `Stop measuring the distance. Release your grip on the "how" and the "when." To capture your digital Blexxing, initiate the sealing ritual below.`,
       sigilData: [
         {
           id: "BNSH",
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
       colorGlow: "#ffb700",
       seedPrefix: "BX-MNFS",
       inviteQuote: `"We do not seek what is already there. In the House of Manifestation, we draw the circle to hold the dream until it breathes."`,
-      inviteInstruction: `Define your reality. Command the canvas of raw visual energy to crystallize your thoughts. Initiate the collapse vector below to manifest your sigil.`,
+      inviteInstruction: `Define your reality. Command the canvas of raw visual energy to crystallize your thoughts. Initiate the sealing ritual below to manifest your sigil.`,
       sigilData: [
         {
           id: "VSN",
@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
       colorGlow: "#ff007f",
       seedPrefix: "BX-DVTN",
       inviteQuote: `"The anchor holds when the ground splits. In the House of Devotion, we lay the square foundation to stand against the storm."`,
-      inviteInstruction: `Dedicate your energy. Lock down visual noise into rigid, unbreakable structural architecture. Initiate the collapse vector below to anchor your devotions.`,
+      inviteInstruction: `Dedicate your energy. Lock down visual noise into rigid, unbreakable structural architecture. Initiate the sealing ritual below to anchor your devotions.`,
       sigilData: [
         {
           id: "ANC",
@@ -1065,7 +1065,7 @@ document.addEventListener('DOMContentLoaded', () => {
       targetCtx.fillStyle = 'rgba(255, 255, 255, 0.25)';
       targetCtx.font = "8px 'Share Tech Mono'";
       targetCtx.fillText("SYS_ENTROPY: OVERLOAD", 15, Math.random() * CANVAS_HEIGHT);
-      targetCtx.fillText("BX-COLLAPSE_INCOMING_VECTOR", 320, Math.random() * CANVAS_HEIGHT);
+      targetCtx.fillText("BX-SEAL_INCOMING_VECTOR", 320, Math.random() * CANVAS_HEIGHT);
     }
 
     const numLines = Math.floor(Math.random() * 3);
@@ -1225,7 +1225,7 @@ document.addEventListener('DOMContentLoaded', () => {
       cardInvitation.classList.add('hidden');
       cardReceipt.classList.remove('hidden');
 
-      statusText.textContent = "BX SECURE COLLAPSE";
+      statusText.textContent = "BX SECURE SEAL";
 
     }, 850);
   });
@@ -1428,9 +1428,9 @@ document.addEventListener('DOMContentLoaded', () => {
           // 3. Update the Email pre-filled body to link directly to the hosted animated GIF!
           const emailSubject = encodeURIComponent(`My Digital Blexxing - House of ${activeHouse.name}`);
           const emailBody = encodeURIComponent(
-`I have frozen the visual entropy loop in the House of ${activeHouse.name}!
+`I have bound the sacred pattern in the House of ${activeHouse.name}!
 
-My Collapsed Sigil: ${activeHouse.sigilData[collapsedSigilIndex].name}
+My Sealed Sigil: ${activeHouse.sigilData[collapsedSigilIndex].name}
 My Cryptographic Seed: ${seedCode}
 My Fulfillment Data Hook: ${fullFulfillmentCode}
 
@@ -1447,9 +1447,9 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
         // Fallback: If Firebase fails, still configure the mailto link without the hosted URL
         const emailSubject = encodeURIComponent(`My Digital Blexxing - House of ${activeHouse.name}`);
         const emailBody = encodeURIComponent(
-`I have frozen the visual entropy loop in the House of ${activeHouse.name}!
+`I have bound the sacred pattern in the House of ${activeHouse.name}!
 
-My Collapsed Sigil: ${activeHouse.sigilData[collapsedSigilIndex].name}
+My Sealed Sigil: ${activeHouse.sigilData[collapsedSigilIndex].name}
 My Cryptographic Seed: ${seedCode}
 My Fulfillment Data Hook: ${fullFulfillmentCode}
 
@@ -1488,7 +1488,7 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
       feedContainer.innerHTML = '';
       
       if (querySnapshot.empty) {
-        feedContainer.innerHTML = '<div class="feed-placeholder font-mono">NO CRYPTOGRAPHIC ARCHIVES COLLAPSED YET. INITIATE THE FLOW.</div>';
+        feedContainer.innerHTML = '<div class="feed-placeholder font-mono">NO CRYPTOGRAPHIC ARCHIVES SEALED YET. BIND THE PATTERN.</div>';
         return;
       }
       
