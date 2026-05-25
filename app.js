@@ -175,6 +175,51 @@ document.addEventListener('DOMContentLoaded', () => {
   let seedCode = "";
   let fullFulfillmentCode = "";
 
+  // --- Geolocation State & Resolver ---
+  let userLocation = "SECURE NODE";
+
+  async function fetchUserLocation() {
+    try {
+      const res = await fetch('https://ipapi.co/json/');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.city && data.country_code) {
+          const regionStr = data.region_code ? `, ${data.region_code}` : '';
+          userLocation = `${data.city}${regionStr}, ${data.country_code}`.toUpperCase();
+          console.log("Resolved Geolocation Node (IP):", userLocation);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("IP Geolocation failed, attempting native browser fallback...", e);
+    }
+    
+    // Fallback: Try native browser Geolocation API
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
+            if (res.ok) {
+              const data = await res.json();
+              const city = data.address.city || data.address.town || data.address.village || 'Unknown City';
+              const country = data.address.country_code ? data.address.country_code.toUpperCase() : 'Global';
+              userLocation = `${city}, ${country}`.toUpperCase();
+              console.log("Resolved Geolocation Node (OSM):", userLocation);
+            }
+          } catch (err) {
+            console.error("OSM Reverse Geocoding failed:", err);
+          }
+        },
+        () => {},
+        { timeout: 3000 }
+      );
+    }
+  }
+  // Initialize background Geolocation fetch immediately
+  fetchUserLocation();
+
   // Timing parameters for Entropy Engine Loop
   const LOOP_TIMINGS = {
     stateDuration: 220, // Milliseconds per core sigil
@@ -1362,6 +1407,7 @@ document.addEventListener('DOMContentLoaded', () => {
               entropy: parseFloat(document.getElementById('receipt-entropy').textContent) || 99.84,
               hash: receiptHash.textContent,
               gifUrl: downloadURL,
+              location: userLocation,
               timestamp: serverTimestamp()
             };
             
@@ -1440,6 +1486,7 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
         card.innerHTML = `
           <div class="feed-card-header font-mono">
             <span class="feed-house ${houseColorClass}">HOUSE: ${data.house.toUpperCase()}</span>
+            <span class="feed-location font-mono">[${data.location || 'SECURE NODE'}]</span>
             <span class="feed-time">${data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString() : 'RECENT'}</span>
           </div>
           <div class="feed-card-body">
