@@ -6,6 +6,27 @@
  * ==========================================================================
  */
 
+// --- Firebase Web SDK 10+ ES Module Imports from Google CDN ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, addDoc, serverTimestamp, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCIeaclBLrp2XNE-o71zbl6u83SVf_FtS4",
+  authDomain: "blexxing-gener8r.firebaseapp.com",
+  projectId: "blexxing-gener8r",
+  storageBucket: "blexxing-gener8r.firebasestorage.app",
+  messagingSenderId: "281372301540",
+  appId: "1:281372301540:web:1e212206d542bda2e834f1",
+  measurementId: "G-NV6WKFMKPH"
+};
+
+// Initialize Firebase App & Services
+const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
+const storage = getStorage(firebaseApp);
+
 document.addEventListener('DOMContentLoaded', () => {
   
   // --- UI Elements ---
@@ -1322,9 +1343,56 @@ document.addEventListener('DOMContentLoaded', () => {
         downloadGifLink.href = obj.image;
         downloadGifLink.download = `BLEXX_${seedCode}_${activeHouse.sigilData[collapsedSigilIndex].id}.gif`;
 
-        // Generate dynamic email mailto sharing details
-        const emailSubject = encodeURIComponent(`My Digital Blexxing - House of ${activeHouse.name}`);
-        const emailBody = encodeURIComponent(
+        // 1. Upload base64 GIF to Firebase Storage in background
+        loaderStatus.textContent = 'PUBLISHING TO SECURE ARCHIVE...';
+        const storageRef = ref(storage, `blexxings/${seedCode}.gif`);
+        
+        uploadString(storageRef, obj.image, 'data_url').then((snapshot) => {
+          getDownloadURL(snapshot.ref).then((downloadURL) => {
+            console.log("GIF successfully uploaded to Storage:", downloadURL);
+            
+            // 2. Write metadata document to Firestore database
+            const blexxingData = {
+              house: currentHouse,
+              houseName: activeHouse.name,
+              sigilName: activeHouse.sigilData[collapsedSigilIndex].name,
+              sigilId: activeHouse.sigilData[collapsedSigilIndex].id,
+              seed: seedCode,
+              fulfillmentCode: fullFulfillmentCode,
+              entropy: parseFloat(document.getElementById('receipt-entropy').textContent) || 99.84,
+              hash: receiptHash.textContent,
+              gifUrl: downloadURL,
+              timestamp: serverTimestamp()
+            };
+            
+            addDoc(collection(db, "blexxings"), blexxingData).then((docRef) => {
+              console.log("Document successfully written with ID:", docRef.id);
+              // Trigger real-time feed load
+              loadGlobalFeed();
+            }).catch(err => console.error("Error writing document to Firestore:", err));
+            
+            // 3. Update the Email pre-filled body to link directly to the hosted animated GIF!
+            const emailSubject = encodeURIComponent(`My Digital Blexxing - House of ${activeHouse.name}`);
+            const emailBody = encodeURIComponent(
+`I have frozen the visual entropy loop in the House of ${activeHouse.name}!
+
+My Collapsed Sigil: ${activeHouse.sigilData[collapsedSigilIndex].name}
+My Cryptographic Seed: ${seedCode}
+My Fulfillment Data Hook: ${fullFulfillmentCode}
+
+🔗 View my live animated Blexxing here:
+${downloadURL}
+
+Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/`
+            );
+            emailGifLink.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+          });
+        }).catch(err => {
+          console.error("Firebase Storage Upload Failed:", err);
+          
+          // Fallback: If Firebase fails (e.g. security rules are not open yet), still configure the mailto link without the hosted URL
+          const emailSubject = encodeURIComponent(`My Digital Blexxing - House of ${activeHouse.name}`);
+          const emailBody = encodeURIComponent(
 `I have frozen the visual entropy loop in the House of ${activeHouse.name}!
 
 My Collapsed Sigil: ${activeHouse.sigilData[collapsedSigilIndex].name}
@@ -1334,8 +1402,9 @@ My Fulfillment Data Hook: ${fullFulfillmentCode}
 ⚡ [Tip: Drag and drop or copy-paste your downloaded Blexxing file directly into this email to share the pulsing animation!]
 
 Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/`
-        );
-        emailGifLink.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+          );
+          emailGifLink.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+        });
 
         cardProcessing.classList.add('hidden');
         cardExport.classList.remove('hidden');
@@ -1348,6 +1417,53 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
     cardReceipt.classList.remove('hidden');
   });
 
+  // --- Global Blexxing Archive Loader ---
+  function loadGlobalFeed() {
+    const q = query(collection(db, "blexxings"), orderBy("timestamp", "desc"), limit(6));
+    getDocs(q).then((querySnapshot) => {
+      const feedContainer = document.getElementById('feed-container');
+      if (!feedContainer) return;
+      feedContainer.innerHTML = '';
+      
+      if (querySnapshot.empty) {
+        feedContainer.innerHTML = '<div class="feed-placeholder font-mono">NO CRYPTOGRAPHIC ARCHIVES COLLAPSED YET. INITIATE THE FLOW.</div>';
+        return;
+      }
+      
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const card = document.createElement('div');
+        const houseColorClass = data.house === 'chance' ? 'cyan-text' : data.house === 'manifestation' ? 'amber-text' : 'magenta-text';
+        const houseAccentColor = data.house === 'chance' ? '#00f3ff' : data.house === 'manifestation' ? '#ffb700' : '#ff007f';
+        
+        card.className = 'feed-card glass-sub-panel';
+        card.innerHTML = `
+          <div class="feed-card-header font-mono">
+            <span class="feed-house ${houseColorClass}">HOUSE: ${data.house.toUpperCase()}</span>
+            <span class="feed-time">${data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString() : 'RECENT'}</span>
+          </div>
+          <div class="feed-card-body">
+            <div class="feed-thumbnail-wrapper">
+              <img src="${data.gifUrl}" alt="${data.sigilName}" class="feed-thumbnail" style="border-color: ${houseAccentColor}">
+            </div>
+            <div class="feed-meta font-mono">
+              <div class="feed-sigil">${data.sigilName}</div>
+              <div class="feed-seed">${data.fulfillmentCode}</div>
+            </div>
+          </div>
+        `;
+        feedContainer.appendChild(card);
+      });
+    }).catch(err => {
+      console.error("Error loading feed:", err);
+      const feedContainer = document.getElementById('feed-container');
+      if (feedContainer) {
+        feedContainer.innerHTML = '<div class="feed-placeholder font-mono">SECURE ARCHIVE STORAGE ACTIVE. RETRIEVAL PROTOCOLS STANDBY.</div>';
+      }
+    });
+  }
+
   // --- Booting the Application ---
+  loadGlobalFeed();
   runEntropyEngine();
 });

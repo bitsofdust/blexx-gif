@@ -679,6 +679,115 @@ body {
   gap: 12px;
 }
 
+/* --- Global Archive Feed Panel --- */
+.archive-section {
+  margin-top: 24px;
+  padding: 16px 20px;
+}
+
+.archive-section .card-title {
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.feed-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  max-height: 170px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.feed-placeholder {
+  grid-column: 1 / -1;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  padding: 24px 0;
+  letter-spacing: 0.1em;
+}
+
+.feed-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  transition: all var(--transition-fast);
+}
+
+.feed-card:hover {
+  border-color: var(--color-cyan-glow);
+  transform: translateY(-1px);
+  background: rgba(0, 0, 0, 0.65);
+}
+
+.feed-card-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  color: var(--color-text-secondary);
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.08);
+  padding-bottom: 4px;
+}
+
+.feed-house {
+  font-weight: bold;
+}
+
+.feed-card-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.feed-thumbnail-wrapper {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #020203;
+}
+
+.feed-thumbnail {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.feed-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 0.72rem;
+}
+
+.feed-sigil {
+  font-weight: bold;
+  color: var(--color-white);
+}
+
+.feed-seed {
+  color: var(--color-text-secondary);
+  font-size: 0.65rem;
+}
+
+.amber-text {
+  color: #ffb700 !important;
+  text-shadow: 0 0 10px rgba(255, 183, 0, 0.3);
+}
+
+.magenta-text {
+  color: #ff007f !important;
+  text-shadow: 0 0 10px rgba(255, 0, 127, 0.3);
+}
+
 /* --- Footer HUD Details --- */
 .app-footer {
   display: flex;
