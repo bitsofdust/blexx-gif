@@ -1465,7 +1465,7 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
 
   // --- Global Blexxing Archive Loader ---
   function loadGlobalFeed() {
-    const q = query(collection(db, "blexxings"), orderBy("timestamp", "desc"), limit(6));
+    const q = query(collection(db, "blexxings"), orderBy("timestamp", "desc"), limit(3));
     getDocs(q).then((querySnapshot) => {
       const feedContainer = document.getElementById('feed-container');
       if (!feedContainer) return;
