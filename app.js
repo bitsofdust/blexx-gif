@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   const gifPreview = document.getElementById('gif-preview');
   const downloadGifLink = document.getElementById('download-gif-link');
+  const emailGifLink = document.getElementById('email-gif-link');
 
   // --- Constants & Config ---
   const CANVAS_WIDTH = 500;
@@ -1320,6 +1321,19 @@ document.addEventListener('DOMContentLoaded', () => {
         gifPreview.src = obj.image;
         downloadGifLink.href = obj.image;
         downloadGifLink.download = `BLEXX_${seedCode}_${activeHouse.sigilData[collapsedSigilIndex].id}.gif`;
+
+        // Generate dynamic email mailto sharing details
+        const emailSubject = encodeURIComponent(`My Digital Blexxing - House of ${activeHouse.name}`);
+        const emailBody = encodeURIComponent(
+`I have frozen the visual entropy loop in the House of ${activeHouse.name}!
+
+My Collapsed Sigil: ${activeHouse.sigilData[collapsedSigilIndex].name}
+My Cryptographic Seed: ${seedCode}
+My Fulfillment Data Hook: ${fullFulfillmentCode}
+
+Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/`
+        );
+        emailGifLink.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
 
         cardProcessing.classList.add('hidden');
         cardExport.classList.remove('hidden');
