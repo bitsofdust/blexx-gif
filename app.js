@@ -1566,7 +1566,6 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
       // 1. Save securely to Cloud Firestore spreadsheet database ledger
       addDoc(collection(db, "physical_orders"), orderData).then((docRef) => {
         console.log("Physical order securely saved to Firestore spreadsheet database with ID:", docRef.id);
-        appendLog(`FIRESTORE_DB // PHYSICAL ORDER REGISTERED. ID: ${docRef.id.substring(0, 8)}...`, "cyan-text");
 
         alert("PHYSICAL SHIPMENT CONFIRMED!\n\nYour shipping coordinates have been securely saved to the database spreadsheet ledger.");
         
@@ -1586,12 +1585,9 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
     adminExportBtn.addEventListener('click', (e) => {
       e.preventDefault();
       
-      appendLog("ADMIN // RETRIEVING ALL PHYSICAL SHIPPINGS FROM LEDGER...");
-      
       getDocs(collection(db, "physical_orders")).then((querySnapshot) => {
         if (querySnapshot.empty) {
           alert("No shipping orders found in the database yet!");
-          appendLog("ADMIN // RETRIEVAL COMPLETE: 0 ORDERS FOUND", "magenta-text");
           return;
         }
         
@@ -1614,7 +1610,6 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
         downloadLink.click();
         document.body.removeChild(downloadLink);
         
-        appendLog(`ADMIN // COMPILED ${querySnapshot.size} ORDERS INTO CSV SPREADSHEET`, "cyan-text");
       }).catch(err => {
         console.error("Admin ledger export failed:", err);
         alert("Failed to retrieve orders from database ledger.");
