@@ -1579,44 +1579,6 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
     });
   }
 
-  // --- Admin Combined CSV Spreadsheet Exporter ---
-  const adminExportBtn = document.getElementById('admin-export-btn');
-  if (adminExportBtn) {
-    adminExportBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      
-      getDocs(collection(db, "physical_orders")).then((querySnapshot) => {
-        if (querySnapshot.empty) {
-          alert("No shipping orders found in the database yet!");
-          return;
-        }
-        
-        // Compile all database documents into a single, combined CSV spreadsheet
-        let csvContent = "NAME,STREET_ADDRESS,CITY,STATE,POSTAL_CODE,COUNTRY,SEED_CODE,FULFILLMENT_CODE,SECURE_HASH,HOUSE_REALM,TIMESTAMP_UTC\n";
-        
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-          const tstamp = data.timestamp ? new Date(data.timestamp.seconds * 1000).toISOString() : 'RECENT';
-          csvContent += `"${data.name.replace(/"/g, '""')}","${data.address.replace(/"/g, '""')}","${data.city.replace(/"/g, '""')}","${data.state.replace(/"/g, '""')}","${data.zip.replace(/"/g, '""')}","${data.country.replace(/"/g, '""')}","${data.seed}","${data.fulfillmentCode}","${data.hash}","${data.house.toUpperCase()}","${tstamp}"\n`;
-        });
-        
-        const csvBlob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        const csvUrl = URL.createObjectURL(csvBlob);
-        
-        const downloadLink = document.createElement("a");
-        downloadLink.setAttribute("href", csvUrl);
-        downloadLink.setAttribute("download", "BLEXX_PHYSICAL_ORDERS_DATABASE.csv");
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        
-      }).catch(err => {
-        console.error("Admin ledger export failed:", err);
-        alert("Failed to retrieve orders from database ledger.");
-      });
-    });
-  }
-
   // --- Booting the Application ---
   loadGlobalFeed();
   runEntropyEngine();

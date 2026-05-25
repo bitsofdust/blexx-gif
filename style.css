@@ -989,19 +989,3 @@ dialog::backdrop {
 .modal-actions .cyber-btn {
   flex: 1;
 }
-
-/* Admin Link Footer Style */
-.admin-link {
-  color: var(--color-text-secondary);
-  text-decoration: none;
-  margin-left: 10px;
-  opacity: 0.6;
-  font-size: 0.65rem;
-  transition: all var(--transition-fast);
-}
-
-.admin-link:hover {
-  color: var(--color-cyan);
-  opacity: 1;
-  text-shadow: 0 0 8px var(--color-cyan-glow);
-}
