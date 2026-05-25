@@ -1567,7 +1567,7 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
       addDoc(collection(db, "physical_orders"), orderData).then((docRef) => {
         console.log("Physical order securely saved to Firestore spreadsheet database with ID:", docRef.id);
 
-        alert("PHYSICAL SHIPMENT CONFIRMED!\n\nYour shipping coordinates have been securely saved to the database spreadsheet ledger.");
+        alert("Success!\n\nYour shipping coordinates have been encoded for BLEXX PHYSICAL delivery.");
         
         // Reset form and close
         physicalForm.reset();
