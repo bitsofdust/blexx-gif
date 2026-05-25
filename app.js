@@ -27,6 +27,9 @@ const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
 const storage = getStorage(firebaseApp);
 
+// --- Utility Helpers ---
+const delay = ms => new Promise(res => setTimeout(res, ms));
+
 document.addEventListener('DOMContentLoaded', () => {
   
   // --- UI Elements ---
@@ -1284,7 +1287,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- GIF Compiler Engine ---
 
-  btnGif.addEventListener('click', () => {
+  btnGif.addEventListener('click', async () => {
     if (!isCollapsed) return;
 
     cardReceipt.classList.add('hidden');
@@ -1294,6 +1297,12 @@ document.addEventListener('DOMContentLoaded', () => {
     loaderPercent.textContent = '0%';
     loaderStatus.textContent = 'PREPARING MATRIX FRAMEWORKS...';
 
+    await delay(700);
+
+    loaderProgressBar.style.width = '15%';
+    loaderPercent.textContent = '15%';
+    loaderStatus.textContent = 'CAPTURING GEOMETRIC CYCLES...';
+
     const offscreen = document.createElement('canvas');
     offscreen.width = 400;
     offscreen.height = 400;
@@ -1302,10 +1311,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const frameImages = [];
     const numFrames = 15;
     
-    loaderProgressBar.style.width = '10%';
-    loaderPercent.textContent = '10%';
-    loaderStatus.textContent = 'CAPTURING GEOMETRIC CYCLES...';
-
     const activeHouse = HOUSE_CONFIG[currentHouse];
 
     for (let f = 0; f < numFrames; f++) {
@@ -1354,9 +1359,15 @@ document.addEventListener('DOMContentLoaded', () => {
       frameImages.push(offscreen.toDataURL('image/png'));
     }
 
-    loaderProgressBar.style.width = '30%';
-    loaderPercent.textContent = '30%';
+    await delay(800);
+
+    loaderProgressBar.style.width = '35%';
+    loaderPercent.textContent = '35%';
     loaderStatus.textContent = 'COMPILING ENCODERS...';
+
+    await delay(600);
+
+    loaderStatus.textContent = 'COMPILING MULTI-THREAD WORKERS...';
 
     gifshot.createGIF({
       images: frameImages,
@@ -1364,10 +1375,9 @@ document.addEventListener('DOMContentLoaded', () => {
       gifHeight: 400,
       interval: 0.1, // 100ms per frame
       progressCallback: (progressPercent) => {
-        const computedPercent = Math.min(99, Math.round(30 + progressPercent * 70));
+        const computedPercent = Math.min(90, Math.round(35 + progressPercent * 55));
         loaderProgressBar.style.width = `${computedPercent}%`;
         loaderPercent.textContent = `${computedPercent}%`;
-        loaderStatus.textContent = 'COMPILING MULTI-THREAD WORKERS...';
       }
     }, (obj) => {
       if (obj.error) {
@@ -1379,47 +1389,45 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      loaderProgressBar.style.width = '100%';
-      loaderPercent.textContent = '100%';
-      loaderStatus.textContent = 'COMPILATION COMPLETE!';
+      loaderProgressBar.style.width = '95%';
+      loaderPercent.textContent = '95%';
+      loaderStatus.textContent = 'PUBLISHING TO SECURE ARCHIVE...';
 
-      setTimeout(() => {
-        gifPreview.src = obj.image;
-        downloadGifLink.href = obj.image;
-        downloadGifLink.download = `BLEXX_${seedCode}_${activeHouse.sigilData[collapsedSigilIndex].id}.gif`;
+      gifPreview.src = obj.image;
+      downloadGifLink.href = obj.image;
+      downloadGifLink.download = `BLEXX_${seedCode}_${activeHouse.sigilData[collapsedSigilIndex].id}.gif`;
 
-        // 1. Upload base64 GIF to Firebase Storage in background
-        loaderStatus.textContent = 'PUBLISHING TO SECURE ARCHIVE...';
-        const storageRef = ref(storage, `blexxings/${seedCode}.gif`);
-        
-        uploadString(storageRef, obj.image, 'data_url').then((snapshot) => {
-          getDownloadURL(snapshot.ref).then((downloadURL) => {
-            console.log("GIF successfully uploaded to Storage:", downloadURL);
-            
-            // 2. Write metadata document to Firestore database
-            const blexxingData = {
-              house: currentHouse,
-              houseName: activeHouse.name,
-              sigilName: activeHouse.sigilData[collapsedSigilIndex].name,
-              sigilId: activeHouse.sigilData[collapsedSigilIndex].id,
-              seed: seedCode,
-              fulfillmentCode: fullFulfillmentCode,
-              entropy: parseFloat(document.getElementById('receipt-entropy').textContent) || 99.84,
-              hash: receiptHash.textContent,
-              gifUrl: downloadURL,
-              location: userLocation,
-              timestamp: serverTimestamp()
-            };
-            
-            addDoc(collection(db, "blexxings"), blexxingData).then((docRef) => {
-              console.log("Document successfully written with ID:", docRef.id);
-              // Trigger real-time feed load
-              loadGlobalFeed();
-            }).catch(err => console.error("Error writing document to Firestore:", err));
-            
-            // 3. Update the Email pre-filled body to link directly to the hosted animated GIF!
-            const emailSubject = encodeURIComponent(`My Digital Blexxing - House of ${activeHouse.name}`);
-            const emailBody = encodeURIComponent(
+      // 1. Upload base64 GIF to Firebase Storage in background
+      const storageRef = ref(storage, `blexxings/${seedCode}.gif`);
+      
+      uploadString(storageRef, obj.image, 'data_url').then((snapshot) => {
+        getDownloadURL(snapshot.ref).then((downloadURL) => {
+          console.log("GIF successfully uploaded to Storage:", downloadURL);
+          
+          // 2. Write metadata document to Firestore database
+          const blexxingData = {
+            house: currentHouse,
+            houseName: activeHouse.name,
+            sigilName: activeHouse.sigilData[collapsedSigilIndex].name,
+            sigilId: activeHouse.sigilData[collapsedSigilIndex].id,
+            seed: seedCode,
+            fulfillmentCode: fullFulfillmentCode,
+            entropy: parseFloat(document.getElementById('receipt-entropy').textContent) || 99.84,
+            hash: receiptHash.textContent,
+            gifUrl: downloadURL,
+            location: userLocation,
+            timestamp: serverTimestamp()
+          };
+          
+          addDoc(collection(db, "blexxings"), blexxingData).then((docRef) => {
+            console.log("Document successfully written with ID:", docRef.id);
+            // Trigger real-time feed load
+            loadGlobalFeed();
+          }).catch(err => console.error("Error writing document to Firestore:", err));
+          
+          // 3. Update the Email pre-filled body to link directly to the hosted animated GIF!
+          const emailSubject = encodeURIComponent(`My Digital Blexxing - House of ${activeHouse.name}`);
+          const emailBody = encodeURIComponent(
 `I have frozen the visual entropy loop in the House of ${activeHouse.name}!
 
 My Collapsed Sigil: ${activeHouse.sigilData[collapsedSigilIndex].name}
@@ -1430,15 +1438,15 @@ My Fulfillment Data Hook: ${fullFulfillmentCode}
 ${downloadURL}
 
 Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/`
-            );
-            emailGifLink.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
-          });
-        }).catch(err => {
-          console.error("Firebase Storage Upload Failed:", err);
-          
-          // Fallback: If Firebase fails (e.g. security rules are not open yet), still configure the mailto link without the hosted URL
-          const emailSubject = encodeURIComponent(`My Digital Blexxing - House of ${activeHouse.name}`);
-          const emailBody = encodeURIComponent(
+          );
+          emailGifLink.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+        });
+      }).catch(err => {
+        console.error("Firebase Storage Upload Failed:", err);
+        
+        // Fallback: If Firebase fails, still configure the mailto link without the hosted URL
+        const emailSubject = encodeURIComponent(`My Digital Blexxing - House of ${activeHouse.name}`);
+        const emailBody = encodeURIComponent(
 `I have frozen the visual entropy loop in the House of ${activeHouse.name}!
 
 My Collapsed Sigil: ${activeHouse.sigilData[collapsedSigilIndex].name}
@@ -1448,13 +1456,21 @@ My Fulfillment Data Hook: ${fullFulfillmentCode}
 ⚡ [Tip: Drag and drop or copy-paste your downloaded Blexxing file directly into this email to share the pulsing animation!]
 
 Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/`
-          );
-          emailGifLink.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
-        });
+        );
+        emailGifLink.href = `mailto:?subject=${emailSubject}&body=${emailBody}`;
+      });
 
-        cardProcessing.classList.add('hidden');
-        cardExport.classList.remove('hidden');
-      }, 500);
+      // Allow final steps to be read before finishing
+      setTimeout(() => {
+        loaderProgressBar.style.width = '100%';
+        loaderPercent.textContent = '100%';
+        loaderStatus.textContent = 'COMPILATION COMPLETE!';
+        
+        setTimeout(() => {
+          cardProcessing.classList.add('hidden');
+          cardExport.classList.remove('hidden');
+        }, 1200);
+      }, 800);
     });
   });
 
