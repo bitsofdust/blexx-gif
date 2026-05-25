@@ -1231,7 +1231,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   /**
-   * Action 2: RELEASE TO FLOW
+   * Action 2: UNSEAL THE PATTERN
    */
   btnRelease.addEventListener('click', () => {
     isCollapsed = false;
@@ -1430,9 +1430,8 @@ document.addEventListener('DOMContentLoaded', () => {
           const emailBody = encodeURIComponent(
 `I have bound the sacred pattern in the House of ${activeHouse.name}!
 
-My Sealed Sigil: ${activeHouse.sigilData[collapsedSigilIndex].name}
-My Cryptographic Seed: ${seedCode}
-My Fulfillment Data Hook: ${fullFulfillmentCode}
+Sealed Sigil: ${fullFulfillmentCode}
+Secure Hash: ${receiptHash.textContent}
 
 🔗 View my live animated Blexxing here:
 ${downloadURL}
@@ -1449,9 +1448,8 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
         const emailBody = encodeURIComponent(
 `I have bound the sacred pattern in the House of ${activeHouse.name}!
 
-My Sealed Sigil: ${activeHouse.sigilData[collapsedSigilIndex].name}
-My Cryptographic Seed: ${seedCode}
-My Fulfillment Data Hook: ${fullFulfillmentCode}
+Sealed Sigil: ${fullFulfillmentCode}
+Secure Hash: ${receiptHash.textContent}
 
 ⚡ [Tip: Drag and drop or copy-paste your downloaded Blexxing file directly into this email to share the pulsing animation!]
 
