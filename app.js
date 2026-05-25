@@ -60,8 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
       directive: "Moving past permission states; serving as the functional catalyst for localized tension generation."
     },
     {
-      id: "RCV",
-      name: "03 RECEIVE",
+      id: "SMN",
+      name: "03 SUMMON",
       desc: "Unconditional integration. Complete physical and narrative ownership over whatever variant state collapses into the perimeter.",
       directive: "Accepting the feedback loop outcome without deploying filtering or structural egress mechanisms."
     }
