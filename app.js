@@ -603,7 +603,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const offscreen = document.createElement('canvas');
     offscreen.width = 400;
     offscreen.height = 400;
-    const octx = offscreen.getContext('2d');
+    const octx = offscreen.getContext('2d', { willReadFrequently: true });
     
     const frameImages = [];
     const numFrames = 15; // 1.5 second loop at 10 fps
