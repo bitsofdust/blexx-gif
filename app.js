@@ -680,7 +680,7 @@ document.addEventListener('DOMContentLoaded', () => {
       gifWidth: 400,
       gifHeight: 400,
       interval: 0.1, // 100ms per frame
-      numWorkers: 4,  // Multi-thread workers for blazing fast rendering
+      numWorkers: 0,  // Disable Web Workers to bypass cross-origin browser security restrictions (CORS) when loading gifshot from CDN
       progressCallback: (progressPercent) => {
         // gifshot returns a float from 0.0 to 1.0 representing render progress
         const computedPercent = Math.min(99, Math.round(30 + progressPercent * 70));
