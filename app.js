@@ -1,7 +1,8 @@
 /**
  * ==========================================================================
- * BLEXX INTERACTIVE ENGINE & GIF COMPILER
- * Technical Architecture: Triangle House of Chance
+ * BLEXX MULTI-HOUSE DIGITAL ENGINE & GIF GENERATOR
+ * Technical Architecture: Triangle, Circle & Square Base Frameworks
+ * Houses: Chance (Cyan), Manifestation (Amber), Devotion (Magenta)
  * ==========================================================================
  */
 
@@ -25,6 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const cardProcessing = document.getElementById('processing-card');
   const cardExport = document.getElementById('export-card');
   
+  const inviteQuote = document.getElementById('invite-quote');
+  const inviteInstruction = document.getElementById('invite-instruction');
+  const hudHouseTitle = document.getElementById('hud-house-title');
+  
   const receiptSigilName = document.getElementById('receipt-sigil-name');
   const receiptSigilDesc = document.getElementById('receipt-sigil-desc');
   const receiptSigilDirective = document.getElementById('receipt-sigil-directive');
@@ -45,35 +50,105 @@ document.addEventListener('DOMContentLoaded', () => {
   const CENTER_X = CANVAS_WIDTH / 2;
   const CENTER_Y = CANVAS_HEIGHT / 2;
 
-  // Narrative data for the 3-Sigil Trinity
-  const SIGIL_DATA = [
-    {
-      id: "BNSH",
-      name: "01 BANISH",
-      desc: "Active extraction. Purging pre-calculated patterns to generate clear runway area for external chaos.",
-      directive: "Pushing back historical stability mechanics to welcome high-variance events."
+  // --- Multi-House Architecture Profiles ---
+  const HOUSE_CONFIG = {
+    chance: {
+      name: "CHANCE",
+      title: "TRIANGLE HOUSE OF CHANCE",
+      themeClass: "house-chance",
+      colorGlow: "#00f3ff",
+      seedPrefix: "BX-CHNC",
+      inviteQuote: `"The door is never where you left it. In the House of Chance, we do not build paths; we step into the wind."`,
+      inviteInstruction: `Stop measuring the distance. Release your grip on the "how" and the "when." To capture your digital Blexxing, initiate the collapse vector below.`,
+      sigilData: [
+        {
+          id: "BNSH",
+          name: "01 BANISH",
+          desc: "Active extraction. Purging pre-calculated patterns to generate clear runway area for external chaos.",
+          directive: "Pushing back historical stability mechanics to welcome high-variance events."
+        },
+        {
+          id: "RSK",
+          name: "02 RISK",
+          desc: "The strategic wager. Executing real-world actions where the transaction cost itself serves as the psychological payout.",
+          directive: "Moving past permission states; serving as the functional catalyst for localized tension generation."
+        },
+        {
+          id: "SMN",
+          name: "03 SUMMON",
+          desc: "Unconditional integration. Complete physical and narrative ownership over whatever variant state collapses into the perimeter.",
+          directive: "Accepting the feedback loop outcome without deploying filtering or structural egress mechanisms."
+        }
+      ]
     },
-    {
-      id: "RSK",
-      name: "02 RISK",
-      desc: "The strategic wager. Executing real-world actions where the transaction cost itself serves as the psychological payout.",
-      directive: "Moving past permission states; serving as the functional catalyst for localized tension generation."
+    manifestation: {
+      name: "MANIFESTATION",
+      title: "CIRCLE HOUSE OF MANIFESTATION",
+      themeClass: "house-manifestation",
+      colorGlow: "#ffb700",
+      seedPrefix: "BX-MNFS",
+      inviteQuote: `"We do not seek what is already there. In the House of Manifestation, we draw the circle to hold the dream until it breathes."`,
+      inviteInstruction: `Define your reality. Command the canvas of raw visual energy to crystallize your thoughts. Initiate the collapse vector below to manifest your sigil.`,
+      sigilData: [
+        {
+          id: "VSN",
+          name: "01 VISION",
+          desc: "Active creation. Projecting and expanding raw future waves outward until they harmonize with material states.",
+          directive: "Setting radial intention coordinates to align reality pathways."
+        },
+        {
+          id: "FCS",
+          name: "02 FOCUS",
+          desc: "Dense spatial centering. Locking down multiple targeting vectors to collapse infinite variants onto a single absolute coordinate.",
+          directive: "Eliminating surrounding wave noise to force reality crystallization."
+        },
+        {
+          id: "ALN",
+          name: "03 ALIGN",
+          desc: "Harmonized integration. Grounding perfect vesica-piscis circular orbits to merge internal intention with external timeline feedback.",
+          directive: "Attaining phase coherence across internal desire and external reaction systems."
+        }
+      ]
     },
-    {
-      id: "SMN",
-      name: "03 SUMMON",
-      desc: "Unconditional integration. Complete physical and narrative ownership over whatever variant state collapses into the perimeter.",
-      directive: "Accepting the feedback loop outcome without deploying filtering or structural egress mechanisms."
+    devotion: {
+      name: "DEVOTION",
+      title: "SQUARE HOUSE OF DEVOTION",
+      themeClass: "house-devotion",
+      colorGlow: "#ff007f",
+      seedPrefix: "BX-DVTN",
+      inviteQuote: `"The anchor holds when the ground splits. In the House of Devotion, we lay the square foundation to stand against the storm."`,
+      inviteInstruction: `Dedicate your energy. Lock down visual noise into rigid, unbreakable structural architecture. Initiate the collapse vector below to anchor your devotions.`,
+      sigilData: [
+        {
+          id: "ANC",
+          name: "01 ANCHOR",
+          desc: "High-integrity structural grounding. Establishing an unyielding framework to lock down core values against external disruption.",
+          directive: "Reinforcing perimeter constraints to resist chaos and establish foundations."
+        },
+        {
+          id: "SCF",
+          name: "02 SACRIFICE",
+          desc: "The systemic threshold. Slicing structural square segments along diagonal split axes to liberate energy for long-term expansion.",
+          directive: "Incurring strategic transaction costs to release localized potential."
+        },
+        {
+          id: "SNC",
+          name: "03 SANCTUARY",
+          desc: "Fortified spatial enclosure. Nested concentric barrier fortresses surrounding and securing high-value digital cores.",
+          directive: "Constructing multi-layered perimeter shields to insulate inner integrity."
+        }
+      ]
     }
-  ];
+  };
 
   // --- State Variables ---
+  let currentHouse = 'chance';
   let isCollapsed = false;
   let isCollapsing = false;
-  let collapsedSigilIndex = 0; // 0: Banish, 1: Risk, 2: Receive
+  let collapsedSigilIndex = 0; // 0, 1, 2
   let animationFrameId = null;
   let time = 0;
-  let entropySpeed = 1; // Animation speed coefficient
+  let entropySpeed = 1;
   let seedCode = "";
   let fullFulfillmentCode = "";
 
@@ -93,15 +168,14 @@ document.addEventListener('DOMContentLoaded', () => {
   updateClock();
 
   // --- Cryptographic Helper ---
-  function generateSeedAndHash(sigilId) {
+  function generateSeedAndHash(housePrefix, sigilId) {
     const chars = '0123456789ABCDEF';
     let seed = '';
     for (let i = 0; i < 6; i++) {
       seed += chars[Math.floor(Math.random() * 16)];
     }
-    const fullCode = `BX-CHNC-${seed}-${sigilId}`;
+    const fullCode = `${housePrefix}-${seed}-${sigilId}`;
     
-    // Simulate a secure SHA-256 hash for visual authenticity
     let hash = '';
     for (let i = 0; i < 32; i++) {
       hash += chars[Math.floor(Math.random() * 16)];
@@ -113,43 +187,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Dynamic Canvas Render Functions ---
 
-  /**
-   * Clears canvas and sets default dark obsidian background
-   */
   function clearCanvas(targetCtx) {
     targetCtx.fillStyle = '#050507';
     targetCtx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   }
 
-  /**
-   * Helper to set premium glow effects
-   */
-  function setGlow(targetCtx, color = '#00f3ff', blur = 15) {
+  function setGlow(targetCtx, color, blur = 15) {
     targetCtx.shadowColor = color;
     targetCtx.shadowBlur = blur;
   }
 
-  /**
-   * Reset shadow parameters to maintain high-contrast shapes
-   */
   function resetGlow(targetCtx) {
     targetCtx.shadowBlur = 0;
     targetCtx.shadowColor = 'transparent';
   }
 
   /**
-   * SIGIL 01: BANISH Drawing Routine
-   * Detached top vertex and radiating shards
+   * HOUSE OF CHANCE: Triangle Base Draw Routines
    */
   function drawBanish(targetCtx, scale = 1, t = 0) {
     const cx = CENTER_X;
-    const cy = CENTER_Y + 15; // Shift slightly down to balance mass
+    const cy = CENTER_Y + 15;
     const R = 120 * scale;
-    
     const sin60 = Math.sin(Math.PI / 3);
     const cos60 = Math.cos(Math.PI / 3);
     
-    // Equilateral Base points
     const x_bl = cx - R * sin60;
     const y_bl = cy + R * cos60;
     const x_br = cx + R * sin60;
@@ -168,17 +230,15 @@ document.addEventListener('DOMContentLoaded', () => {
     targetCtx.stroke();
     resetGlow(targetCtx);
     
-    // Draw Truncated Sides (Banish requires void/shatter effect)
+    // Draw Truncated Sides (Banish void)
     targetCtx.strokeStyle = '#ffffff';
     setGlow(targetCtx, 'rgba(255, 255, 255, 0.4)', 8);
     
-    // Left Side going up (truncated at 60%)
     targetCtx.beginPath();
     targetCtx.moveTo(x_bl, y_bl);
     targetCtx.lineTo(x_bl + R * sin60 * 0.55, y_bl - R * cos60 * 0.55);
     targetCtx.stroke();
     
-    // Right Side going up (truncated at 60%)
     targetCtx.beginPath();
     targetCtx.moveTo(x_br, y_br);
     targetCtx.lineTo(x_br - R * sin60 * 0.55, y_br - R * cos60 * 0.55);
@@ -187,28 +247,23 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Draw Floating Chevron Vertex (Upper Gateway)
     const top_y = cy - R;
-    const offset = 22 * scale; // Distance of float
+    const offset = 22 * scale;
     
-    targetCtx.strokeStyle = '#00f3ff';
-    setGlow(targetCtx, '#00f3ff', 12);
+    targetCtx.strokeStyle = HOUSE_CONFIG.chance.colorGlow;
+    setGlow(targetCtx, HOUSE_CONFIG.chance.colorGlow, 12);
     targetCtx.beginPath();
-    // Chevron pointing up
     targetCtx.moveTo(cx - 24 * scale, top_y + 12 * scale - offset);
     targetCtx.lineTo(cx, top_y - offset);
     targetCtx.lineTo(cx + 24 * scale, top_y + 12 * scale - offset);
     targetCtx.stroke();
     resetGlow(targetCtx);
     
-    // Radiating Chaos Shards (High-Frequency Extraction)
+    // Radiating Chaos Shards
     const numShards = 7;
-    targetCtx.strokeStyle = '#00f3ff';
+    targetCtx.strokeStyle = HOUSE_CONFIG.chance.colorGlow;
     targetCtx.lineWidth = 2;
-    
     for (let i = 0; i < numShards; i++) {
-      // Calculate angles pointing outward from center void
       const angle = (i * Math.PI * 2) / numShards + (t * 0.015);
-      
-      // Animate expansion radius using time
       const expansion = (Math.sin(t * 0.08 + i) * 6) + 12;
       const r_start = (45 + expansion) * scale;
       const r_end = r_start + (14 * scale);
@@ -218,14 +273,12 @@ document.addEventListener('DOMContentLoaded', () => {
       const x2 = cx + Math.cos(angle) * r_end;
       const y2 = cy + Math.sin(angle) * r_end;
       
-      setGlow(targetCtx, '#00f3ff', 8);
+      setGlow(targetCtx, HOUSE_CONFIG.chance.colorGlow, 8);
       targetCtx.beginPath();
       targetCtx.moveTo(x1, y1);
       targetCtx.lineTo(x2, y2);
       targetCtx.stroke();
       resetGlow(targetCtx);
-      
-      // Little square pixel blocks on end of some shards for tech visual
       if (i % 2 === 0) {
         targetCtx.fillStyle = '#ffffff';
         targetCtx.fillRect(x2 - 2, y2 - 2, 4, 4);
@@ -233,17 +286,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /**
-   * SIGIL 02: RISK Drawing Routine
-   * High-aspect vertical needle along coordinate track
-   */
   function drawRisk(targetCtx, scale = 1, t = 0) {
     const cx = CENTER_X;
     const cy = CENTER_Y;
-    const H = 320 * scale; // Diamond length
-    const W = 13 * scale;  // Diamond width
+    const H = 320 * scale;
+    const W = 13 * scale;
     
-    // Vertical Track line (Dashed absolute vertical coordinate)
     targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
     targetCtx.lineWidth = 1;
     targetCtx.setLineDash([4, 8]);
@@ -251,9 +299,8 @@ document.addEventListener('DOMContentLoaded', () => {
     targetCtx.moveTo(cx, cy - (H/2) - 25);
     targetCtx.lineTo(cx, cy + (H/2) + 25);
     targetCtx.stroke();
-    targetCtx.setLineDash([]); // Reset dash
+    targetCtx.setLineDash([]);
     
-    // Draw Axis Tension ticks with small coordinates
     const tickWidth = 28 * scale;
     const ticks = [-120, -60, 0, 60, 120];
     targetCtx.strokeStyle = 'rgba(0, 243, 255, 0.3)';
@@ -267,34 +314,27 @@ document.addEventListener('DOMContentLoaded', () => {
       targetCtx.moveTo(cx - tickWidth / 2, y_pos);
       targetCtx.lineTo(cx + tickWidth / 2, y_pos);
       targetCtx.stroke();
-      
-      // Draw grid tick metric
       const label = (( -offset / 120 )).toFixed(1);
       targetCtx.fillText(`${label}`, cx - (tickWidth / 2) - 6, y_pos + 3);
     });
 
-    // Animate Needle vertical wiggle to show "tension/uncertainty"
     const tensionWiggle = isCollapsed ? 0 : Math.sin(t * 0.25) * 5;
     const finalCy = cy + tensionWiggle;
 
-    // Inner glowing vertical needle
     targetCtx.lineWidth = 2.5;
     targetCtx.strokeStyle = '#ffffff';
     setGlow(targetCtx, 'rgba(255, 255, 255, 0.5)', 8);
-    
-    // Main compressed needle diamond
     targetCtx.beginPath();
-    targetCtx.moveTo(cx, finalCy - H/2); // Top Point
-    targetCtx.lineTo(cx + W, finalCy);   // Right Point
-    targetCtx.lineTo(cx, finalCy + H/2); // Bottom Point
-    targetCtx.lineTo(cx - W, finalCy);   // Left Point
+    targetCtx.moveTo(cx, finalCy - H/2);
+    targetCtx.lineTo(cx + W, finalCy);
+    targetCtx.lineTo(cx, finalCy + H/2);
+    targetCtx.lineTo(cx - W, finalCy);
     targetCtx.closePath();
     targetCtx.stroke();
     resetGlow(targetCtx);
     
-    // Center glowing core needle
-    targetCtx.fillStyle = '#00f3ff';
-    setGlow(targetCtx, '#00f3ff', 15);
+    targetCtx.fillStyle = HOUSE_CONFIG.chance.colorGlow;
+    setGlow(targetCtx, HOUSE_CONFIG.chance.colorGlow, 15);
     targetCtx.beginPath();
     targetCtx.moveTo(cx, finalCy - H * 0.4);
     targetCtx.lineTo(cx + W * 0.4, finalCy);
@@ -305,22 +345,14 @@ document.addEventListener('DOMContentLoaded', () => {
     resetGlow(targetCtx);
   }
 
-  /**
-   * SIGIL 03: RECEIVE Drawing Routine
-   * Grounded equilateral architecture with Solid Seed at center mass
-   */
-  function drawReceive(targetCtx, scale = 1, t = 0) {
+  function drawSummon(targetCtx, scale = 1, t = 0) {
     const cx = CENTER_X;
-    const cy = CENTER_Y + 15; // Shift down
+    const cy = CENTER_Y + 15;
     const R = 120 * scale;
-    
     const sin60 = Math.sin(Math.PI / 3);
     const cos60 = Math.cos(Math.PI / 3);
-    
-    // Centroid of the triangle
-    const centroidY = cy + (R * cos60) / 2; // approx cy + 15 in default
+    const centroidY = cy + (R * cos60) / 2;
 
-    // Vertices of the equilateral triangle
     const x1 = cx;
     const y1 = cy - R;
     const x2 = cx + R * sin60;
@@ -332,7 +364,6 @@ document.addEventListener('DOMContentLoaded', () => {
     targetCtx.lineCap = 'round';
     targetCtx.lineJoin = 'round';
     
-    // Draw Perfect Symmetrical Triangle Border
     targetCtx.strokeStyle = '#ffffff';
     setGlow(targetCtx, 'rgba(255, 255, 255, 0.4)', 8);
     targetCtx.beginPath();
@@ -343,7 +374,6 @@ document.addEventListener('DOMContentLoaded', () => {
     targetCtx.stroke();
     resetGlow(targetCtx);
 
-    // Crosshairs targeting coordinates
     targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
     targetCtx.lineWidth = 1;
     targetCtx.beginPath();
@@ -353,34 +383,313 @@ document.addEventListener('DOMContentLoaded', () => {
     targetCtx.lineTo(cx, centroidY + 70 * scale);
     targetCtx.stroke();
 
-    // Radar Tracking Ring (Equilibrium tracking)
     targetCtx.strokeStyle = 'rgba(0, 243, 255, 0.25)';
-    targetCtx.lineWidth = 1;
     targetCtx.setLineDash([3, 5]);
     targetCtx.beginPath();
     targetCtx.arc(cx, centroidY, 32 * scale, 0, Math.PI * 2);
     targetCtx.stroke();
-    targetCtx.setLineDash([]); // Reset
+    targetCtx.setLineDash([]);
     
-    // Outer solid tracking ring
     targetCtx.strokeStyle = 'rgba(0, 243, 255, 0.15)';
     targetCtx.beginPath();
     targetCtx.arc(cx, centroidY, 52 * scale, 0, Math.PI * 2);
     targetCtx.stroke();
 
-    // The Solid Seed (Dense glowing center mass core)
     const seedPulse = isCollapsed ? 0 : Math.sin(t * 0.12) * 2;
     const seedRadius = (12 + seedPulse) * scale;
     
     targetCtx.fillStyle = '#ffffff';
-    setGlow(targetCtx, '#00f3ff', 20);
+    setGlow(targetCtx, HOUSE_CONFIG.chance.colorGlow, 20);
     targetCtx.beginPath();
     targetCtx.arc(cx, centroidY, seedRadius, 0, Math.PI * 2);
     targetCtx.fill();
     resetGlow(targetCtx);
   }
+
   /**
-   * Generates procedural intermediate triangle variations for visual complexity
+   * HOUSE OF MANIFESTATION: Circle Base Draw Routines
+   */
+  function drawVision(targetCtx, scale = 1, t = 0) {
+    const cx = CENTER_X;
+    const cy = CENTER_Y + 15;
+    const R = 110 * scale;
+    
+    targetCtx.lineWidth = 2.5;
+    
+    // Horizontal Laser Axis
+    targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    targetCtx.beginPath();
+    targetCtx.moveTo(cx - R * 1.35, cy);
+    targetCtx.lineTo(cx + R * 1.35, cy);
+    targetCtx.stroke();
+    
+    // Concentric Solid Rings
+    targetCtx.strokeStyle = '#ffffff';
+    setGlow(targetCtx, 'rgba(255, 255, 255, 0.4)', 8);
+    targetCtx.beginPath();
+    targetCtx.arc(cx, cy, R * 0.72, 0, Math.PI * 2);
+    targetCtx.stroke();
+    
+    targetCtx.beginPath();
+    targetCtx.arc(cx, cy, R, 0, Math.PI * 2);
+    targetCtx.stroke();
+    resetGlow(targetCtx);
+
+    // Expanding Amber Ripple Circle
+    const rippleSpeed = 0.04;
+    const maxRipple = R * 1.25;
+    const rippleRadius = (R * 0.4) + ((t * 2.5) % (maxRipple - R * 0.4));
+    const rippleOpacity = 1.0 - ((rippleRadius - R * 0.4) / (maxRipple - R * 0.4));
+    
+    targetCtx.strokeStyle = `rgba(255, 183, 0, ${rippleOpacity * 0.85})`;
+    setGlow(targetCtx, HOUSE_CONFIG.manifestation.colorGlow, 15);
+    targetCtx.lineWidth = 2;
+    targetCtx.beginPath();
+    targetCtx.arc(cx, cy, rippleRadius, 0, Math.PI * 2);
+    targetCtx.stroke();
+    resetGlow(targetCtx);
+  }
+
+  function drawFocus(targetCtx, scale = 1, t = 0) {
+    const cx = CENTER_X;
+    const cy = CENTER_Y + 15;
+    const R = 110 * scale;
+    
+    targetCtx.lineWidth = 3;
+    
+    // Outer Target Rings
+    targetCtx.strokeStyle = '#ffffff';
+    setGlow(targetCtx, 'rgba(255,255,255,0.4)', 6);
+    targetCtx.beginPath();
+    targetCtx.arc(cx, cy, R * 1.1, 0, Math.PI * 2);
+    targetCtx.stroke();
+    
+    targetCtx.lineWidth = 1.5;
+    targetCtx.strokeStyle = HOUSE_CONFIG.manifestation.colorGlow;
+    setGlow(targetCtx, HOUSE_CONFIG.manifestation.colorGlow, 10);
+    targetCtx.beginPath();
+    targetCtx.arc(cx, cy, R * 0.76, 0, Math.PI * 2);
+    targetCtx.stroke();
+    resetGlow(targetCtx);
+    
+    // Concentric Inward Crosshair ticks
+    targetCtx.strokeStyle = '#ffffff';
+    targetCtx.lineWidth = 2.5;
+    const crosshairOffset = isCollapsed ? 0 : Math.sin(t * 0.18) * 8;
+    const length = 20 * scale;
+    
+    // 4 crosshair needles pointing in
+    const directions = [0, Math.PI/2, Math.PI, Math.PI*1.5];
+    directions.forEach(dir => {
+      const sx = cx + Math.cos(dir) * (R * 1.1 - crosshairOffset);
+      const sy = cy + Math.sin(dir) * (R * 1.1 - crosshairOffset);
+      const ex = cx + Math.cos(dir) * (R * 1.1 - length - crosshairOffset);
+      const ey = cy + Math.sin(dir) * (R * 1.1 - length - crosshairOffset);
+      
+      targetCtx.beginPath();
+      targetCtx.moveTo(sx, sy);
+      targetCtx.lineTo(ex, ey);
+      targetCtx.stroke();
+    });
+    
+    // Target seed core
+    targetCtx.fillStyle = '#ffffff';
+    setGlow(targetCtx, HOUSE_CONFIG.manifestation.colorGlow, 20);
+    targetCtx.beginPath();
+    targetCtx.arc(cx, cy, 6 * scale, 0, Math.PI * 2);
+    targetCtx.fill();
+    resetGlow(targetCtx);
+  }
+
+  function drawAlign(targetCtx, scale = 1, t = 0) {
+    const cx = CENTER_X;
+    const cy = CENTER_Y + 15;
+    const R = 110 * scale;
+    
+    const overlapShift = 28 * scale;
+    const circleRadius = R * 0.72;
+    
+    targetCtx.lineWidth = 3;
+    
+    // Left Align Circle
+    targetCtx.strokeStyle = '#ffffff';
+    setGlow(targetCtx, 'rgba(255,255,255,0.4)', 6);
+    targetCtx.beginPath();
+    targetCtx.arc(cx - overlapShift, cy, circleRadius, 0, Math.PI * 2);
+    targetCtx.stroke();
+    
+    // Right Align Circle
+    targetCtx.beginPath();
+    targetCtx.arc(cx + overlapShift, cy, circleRadius, 0, Math.PI * 2);
+    targetCtx.stroke();
+    resetGlow(targetCtx);
+    
+    // Radar Align line
+    targetCtx.strokeStyle = 'rgba(255, 183, 0, 0.15)';
+    targetCtx.lineWidth = 1;
+    targetCtx.beginPath();
+    targetCtx.moveTo(cx, cy - R);
+    targetCtx.lineTo(cx, cy + R);
+    targetCtx.stroke();
+    
+    // Alignment Seed locked in the vesica-piscis center
+    const pulse = isCollapsed ? 0 : Math.sin(t * 0.1) * 3;
+    targetCtx.fillStyle = '#ffffff';
+    setGlow(targetCtx, HOUSE_CONFIG.manifestation.colorGlow, 22);
+    targetCtx.beginPath();
+    targetCtx.arc(cx, cy, (12 + pulse) * scale, 0, Math.PI * 2);
+    targetCtx.fill();
+    resetGlow(targetCtx);
+  }
+
+  /**
+   * HOUSE OF DEVOTION: Square Base Draw Routines
+   */
+  function drawRotatingSquare(targetCtx, cx, cy, w, h, angle) {
+    targetCtx.save();
+    targetCtx.translate(cx, cy);
+    targetCtx.rotate(angle);
+    targetCtx.beginPath();
+    targetCtx.rect(-w / 2, -h / 2, w, h);
+    targetCtx.stroke();
+    targetCtx.restore();
+  }
+
+  function drawAnchor(targetCtx, scale = 1, t = 0) {
+    const cx = CENTER_X;
+    const cy = CENTER_Y + 15;
+    const S = 190 * scale; // Square size
+    
+    targetCtx.lineWidth = 3;
+    targetCtx.strokeStyle = '#ffffff';
+    targetCtx.lineJoin = 'miter';
+    
+    // Main Square Frame
+    setGlow(targetCtx, 'rgba(255,255,255,0.4)', 6);
+    targetCtx.beginPath();
+    targetCtx.rect(cx - S/2, cy - S/2, S, S);
+    targetCtx.stroke();
+    resetGlow(targetCtx);
+    
+    // Reinforced Corner L-Brackets
+    targetCtx.strokeStyle = HOUSE_CONFIG.devotion.colorGlow;
+    setGlow(targetCtx, HOUSE_CONFIG.devotion.colorGlow, 10);
+    targetCtx.lineWidth = 4;
+    const bracketSize = 24 * scale;
+    
+    // Top-Left L
+    targetCtx.beginPath();
+    targetCtx.moveTo(cx - S/2 + bracketSize, cy - S/2);
+    targetCtx.lineTo(cx - S/2, cy - S/2);
+    targetCtx.lineTo(cx - S/2, cy - S/2 + bracketSize);
+    targetCtx.stroke();
+    
+    // Top-Right L
+    targetCtx.beginPath();
+    targetCtx.moveTo(cx + S/2 - bracketSize, cy - S/2);
+    targetCtx.lineTo(cx + S/2, cy - S/2);
+    targetCtx.lineTo(cx + S/2, cy - S/2 + bracketSize);
+    targetCtx.stroke();
+    
+    // Bottom-Left L
+    targetCtx.beginPath();
+    targetCtx.moveTo(cx - S/2 + bracketSize, cy + S/2);
+    targetCtx.lineTo(cx - S/2, cy + S/2);
+    targetCtx.lineTo(cx - S/2, cy + S/2 - bracketSize);
+    targetCtx.stroke();
+    
+    // Bottom-Right L
+    targetCtx.beginPath();
+    targetCtx.moveTo(cx + S/2 - bracketSize, cy + S/2);
+    targetCtx.lineTo(cx + S/2, cy + S/2);
+    targetCtx.lineTo(cx + S/2, cy + S/2 - bracketSize);
+    targetCtx.stroke();
+    resetGlow(targetCtx);
+    
+    // Central Anchor Stabilizing shaft
+    targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    targetCtx.lineWidth = 1;
+    targetCtx.beginPath();
+    targetCtx.moveTo(cx, cy - S/2 - 15);
+    targetCtx.lineTo(cx, cy + S/2 + 15);
+    targetCtx.stroke();
+    
+    // Core Locking Bolt
+    targetCtx.fillStyle = '#ffffff';
+    setGlow(targetCtx, HOUSE_CONFIG.devotion.colorGlow, 15);
+    targetCtx.fillRect(cx - 8 * scale, cy - 8 * scale, 16 * scale, 16 * scale);
+    resetGlow(targetCtx);
+  }
+
+  function drawSacrifice(targetCtx, scale = 1, t = 0) {
+    const cx = CENTER_X;
+    const cy = CENTER_Y + 15;
+    const S = 195 * scale;
+    
+    targetCtx.lineWidth = 2.5;
+    
+    // Crossing diagonal tension axes
+    targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+    targetCtx.beginPath();
+    targetCtx.moveTo(cx - S/2 - 10, cy - S/2 - 10);
+    targetCtx.lineTo(cx + S/2 + 10, cy + S/2 + 10);
+    targetCtx.moveTo(cx + S/2 + 10, cy - S/2 - 10);
+    targetCtx.lineTo(cx - S/2 - 10, cy + S/2 + 10);
+    targetCtx.stroke();
+    
+    // Layered displaced squares to show "shear/sacrifice"
+    const offsetShear = isCollapsed ? 0 : Math.sin(t * 0.15) * 5;
+    
+    targetCtx.strokeStyle = '#ffffff';
+    setGlow(targetCtx, 'rgba(255,255,255,0.4)', 6);
+    targetCtx.beginPath();
+    targetCtx.rect(cx - S/2 + offsetShear, cy - S/2 - offsetShear, S, S);
+    targetCtx.stroke();
+    
+    targetCtx.strokeStyle = HOUSE_CONFIG.devotion.colorGlow;
+    setGlow(targetCtx, HOUSE_CONFIG.devotion.colorGlow, 12);
+    targetCtx.beginPath();
+    targetCtx.rect(cx - (S * 0.65)/2 - offsetShear, cy - (S * 0.65)/2 + offsetShear, S * 0.65, S * 0.65);
+    targetCtx.stroke();
+    resetGlow(targetCtx);
+  }
+
+  function drawSanctuary(targetCtx, scale = 1, t = 0) {
+    const cx = CENTER_X;
+    const cy = CENTER_Y + 15;
+    const S = 200 * scale;
+    
+    targetCtx.lineWidth = 2.5;
+    targetCtx.strokeStyle = '#ffffff';
+    
+    // Concentric nesting fortress squares
+    setGlow(targetCtx, 'rgba(255,255,255,0.4)', 6);
+    targetCtx.beginPath();
+    targetCtx.rect(cx - S/2, cy - S/2, S, S);
+    targetCtx.stroke();
+    
+    targetCtx.beginPath();
+    targetCtx.rect(cx - (S * 0.7)/2, cy - (S * 0.7)/2, S * 0.7, S * 0.7);
+    targetCtx.stroke();
+    resetGlow(targetCtx);
+    
+    targetCtx.strokeStyle = HOUSE_CONFIG.devotion.colorGlow;
+    setGlow(targetCtx, HOUSE_CONFIG.devotion.colorGlow, 10);
+    targetCtx.beginPath();
+    targetCtx.rect(cx - (S * 0.42)/2, cy - (S * 0.42)/2, S * 0.42, S * 0.42);
+    targetCtx.stroke();
+    resetGlow(targetCtx);
+    
+    // Secured core inside sanctuary
+    const pulse = isCollapsed ? 0 : Math.sin(t * 0.08) * 2;
+    targetCtx.fillStyle = '#ffffff';
+    setGlow(targetCtx, HOUSE_CONFIG.devotion.colorGlow, 20);
+    targetCtx.fillRect(cx - (9 + pulse) * scale, cy - (9 + pulse) * scale, (18 + pulse * 2) * scale, (18 + pulse * 2) * scale);
+    resetGlow(targetCtx);
+  }
+
+  /**
+   * Intermediate Variations Drawing Router
    */
   function drawEntropyVariation(targetCtx, variantIndex, scale = 1, t = 0) {
     const cx = CENTER_X;
@@ -393,184 +702,287 @@ document.addEventListener('DOMContentLoaded', () => {
     targetCtx.lineCap = 'round';
     targetCtx.lineJoin = 'round';
     
-    if (variantIndex === 0) {
-      // Nested Orbit (Double Concentric Triangles rotating in opposite directions)
-      const rOuter = R * 1.15;
-      const rInner = R * 0.7;
-      const rotOuter = t * 0.015;
-      const rotInner = -t * 0.025;
-      
-      // Outer rotating triangle
-      targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-      targetCtx.beginPath();
-      for (let i = 0; i < 3; i++) {
-        const a = rotOuter + (i * Math.PI * 2) / 3 - Math.PI / 2;
-        const x = cx + Math.cos(a) * rOuter;
-        const y = cy + Math.sin(a) * rOuter;
-        if (i === 0) targetCtx.moveTo(x, y);
-        else targetCtx.lineTo(x, y);
-      }
-      targetCtx.closePath();
-      targetCtx.stroke();
-      
-      // Inner rotating triangle
-      targetCtx.strokeStyle = 'rgba(0, 243, 255, 0.7)';
-      setGlow(targetCtx, '#00f3ff', 8);
-      targetCtx.beginPath();
-      for (let i = 0; i < 3; i++) {
-        const a = rotInner + (i * Math.PI * 2) / 3 - Math.PI / 2;
-        const x = cx + Math.cos(a) * rInner;
-        const y = cy + Math.sin(a) * rInner;
-        if (i === 0) targetCtx.moveTo(x, y);
-        else targetCtx.lineTo(x, y);
-      }
-      targetCtx.closePath();
-      targetCtx.stroke();
-      resetGlow(targetCtx);
-      
-    } else if (variantIndex === 1) {
-      // Dotted Matrix / Node Grid Triangle
-      const x1 = cx;
-      const y1 = cy - R;
-      const x2 = cx + R * sin60;
-      const y2 = cy + R * cos60;
-      const x3 = cx - R * sin60;
-      const y3 = cy + R * cos60;
-      
-      targetCtx.fillStyle = '#00f3ff';
-      setGlow(targetCtx, '#00f3ff', 8);
-      
-      // Function to draw dotted line
-      const drawDottedLine = (sx, sy, ex, ey, dots = 10) => {
-        for (let i = 0; i <= dots; i++) {
-          const px = sx + (ex - sx) * (i / dots);
-          const py = sy + (ey - sy) * (i / dots);
+    // --- TRIANGLE Variations (CHANCE) ---
+    if (currentHouse === 'chance') {
+      if (variantIndex === 0) {
+        // Nested Orbit (Double Concentric Triangles)
+        const rOuter = R * 1.15;
+        const rInner = R * 0.7;
+        const rotOuter = t * 0.015;
+        const rotInner = -t * 0.025;
+        
+        targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        targetCtx.beginPath();
+        for (let i = 0; i < 3; i++) {
+          const a = rotOuter + (i * Math.PI * 2) / 3 - Math.PI / 2;
+          targetCtx.lineTo(cx + Math.cos(a) * rOuter, cy + Math.sin(a) * rOuter);
+        }
+        targetCtx.closePath();
+        targetCtx.stroke();
+        
+        targetCtx.strokeStyle = 'rgba(0, 243, 255, 0.7)';
+        setGlow(targetCtx, '#00f3ff', 8);
+        targetCtx.beginPath();
+        for (let i = 0; i < 3; i++) {
+          const a = rotInner + (i * Math.PI * 2) / 3 - Math.PI / 2;
+          targetCtx.lineTo(cx + Math.cos(a) * rInner, cy + Math.sin(a) * rInner);
+        }
+        targetCtx.closePath();
+        targetCtx.stroke();
+        resetGlow(targetCtx);
+        
+      } else if (variantIndex === 1) {
+        // Dotted Matrix Triangle
+        const x1 = cx, y1 = cy - R;
+        const x2 = cx + R * sin60, y2 = cy + R * cos60;
+        const x3 = cx - R * sin60, y3 = cy + R * cos60;
+        
+        targetCtx.fillStyle = '#00f3ff';
+        setGlow(targetCtx, '#00f3ff', 8);
+        const drawDottedLine = (sx, sy, ex, ey, dots = 10) => {
+          for (let i = 0; i <= dots; i++) {
+            targetCtx.beginPath();
+            targetCtx.arc(sx + (ex - sx) * (i / dots), sy + (ey - sy) * (i / dots), 2.5, 0, Math.PI * 2);
+            targetCtx.fill();
+          }
+        };
+        drawDottedLine(x1, y1, x2, y2);
+        drawDottedLine(x2, y2, x3, y3);
+        drawDottedLine(x3, y3, x1, y1);
+        resetGlow(targetCtx);
+        
+        targetCtx.strokeStyle = '#ffffff';
+        targetCtx.lineWidth = 1.5;
+        [ {x:x1, y:y1}, {x:x2, y:y2}, {x:x3, y:y3} ].forEach(vertex => {
           targetCtx.beginPath();
-          targetCtx.arc(px, py, 2.5, 0, Math.PI * 2);
+          targetCtx.arc(vertex.x, vertex.y, 8, 0, Math.PI * 2);
+          targetCtx.stroke();
+        });
+        
+      } else if (variantIndex === 2) {
+        // Morphing Axis Split (Dynamic Wobble)
+        const wobbleX = Math.sin(t * 0.08) * 16;
+        const wobbleY = Math.cos(t * 0.06) * 10;
+        const x1 = cx + wobbleX, y1 = cy - R + wobbleY;
+        const x2 = cx + R * sin60, y2 = cy + R * cos60;
+        const x3 = cx - R * sin60, y3 = cy + R * cos60;
+        
+        targetCtx.strokeStyle = '#ffffff';
+        targetCtx.beginPath();
+        targetCtx.moveTo(x1, y1);
+        targetCtx.lineTo(x2, y2);
+        targetCtx.lineTo(x3, y3);
+        targetCtx.closePath();
+        targetCtx.stroke();
+        
+        targetCtx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
+        targetCtx.setLineDash([2, 5]);
+        targetCtx.beginPath();
+        targetCtx.moveTo(cx, cy - R - 10);
+        targetCtx.lineTo(cx, cy + R + 10);
+        targetCtx.stroke();
+        targetCtx.setLineDash([]);
+        
+      } else if (variantIndex === 3) {
+        // Shattered Frame (Missing side and pieces)
+        const x1 = cx, y1 = cy - R;
+        const x2 = cx + R * sin60, y2 = cy + R * cos60;
+        const x3 = cx - R * sin60, y3 = cy + R * cos60;
+        
+        targetCtx.strokeStyle = '#ffffff';
+        targetCtx.beginPath(); targetCtx.moveTo(x1, y1); targetCtx.lineTo(x3, y3); targetCtx.stroke();
+        targetCtx.beginPath(); targetCtx.moveTo(x1, y1); targetCtx.lineTo(x2, y2); targetCtx.stroke();
+        
+        targetCtx.strokeStyle = 'rgba(0, 243, 255, 0.55)';
+        setGlow(targetCtx, '#00f3ff', 6);
+        const numTicks = 6;
+        for (let i = 0; i <= numTicks; i++) {
+          const px = x3 + (x2 - x3) * (i / numTicks);
+          targetCtx.beginPath(); targetCtx.moveTo(px, y3 - 4); targetCtx.lineTo(px, y3 + 4); targetCtx.stroke();
+        }
+        resetGlow(targetCtx);
+        
+        targetCtx.fillStyle = '#ffffff';
+        for (let i = 0; i < 4; i++) {
+          const px = x3 + (x2 - x3) * ((i + 1) / 5) + Math.sin(t * 0.1 + i) * 5;
+          targetCtx.fillRect(px - 2, y3 + 12 + Math.cos(t * 0.1 + i) * 4 - 2, 4, 4);
+        }
+      }
+    }
+    
+    // --- CIRCLE Variations (MANIFESTATION) ---
+    else if (currentHouse === 'manifestation') {
+      if (variantIndex === 0) {
+        // Nested Concentric Circle Orbit
+        targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        targetCtx.beginPath();
+        targetCtx.arc(cx, cy, R * 1.12, 0, Math.PI * 2);
+        targetCtx.stroke();
+        
+        // Inner rotating circle dot
+        targetCtx.strokeStyle = HOUSE_CONFIG.manifestation.colorGlow;
+        setGlow(targetCtx, HOUSE_CONFIG.manifestation.colorGlow, 8);
+        targetCtx.beginPath();
+        targetCtx.arc(cx, cy, R * 0.75, 0, Math.PI * 2);
+        targetCtx.stroke();
+        
+        const dotAngle = t * 0.04;
+        targetCtx.fillStyle = '#ffffff';
+        targetCtx.beginPath();
+        targetCtx.arc(cx + Math.cos(dotAngle) * R * 0.75, cy + Math.sin(dotAngle) * R * 0.75, 5, 0, Math.PI * 2);
+        targetCtx.fill();
+        resetGlow(targetCtx);
+        
+      } else if (variantIndex === 1) {
+        // Dotted Circle matrix
+        targetCtx.fillStyle = HOUSE_CONFIG.manifestation.colorGlow;
+        setGlow(targetCtx, HOUSE_CONFIG.manifestation.colorGlow, 8);
+        const dotsCount = 28;
+        for (let i = 0; i < dotsCount; i++) {
+          const a = (i * Math.PI * 2) / dotsCount;
+          targetCtx.beginPath();
+          targetCtx.arc(cx + Math.cos(a) * R, cy + Math.sin(a) * R, 2.5, 0, Math.PI * 2);
           targetCtx.fill();
         }
-      };
-      
-      drawDottedLine(x1, y1, x2, y2);
-      drawDottedLine(x2, y2, x3, y3);
-      drawDottedLine(x3, y3, x1, y1);
-      resetGlow(targetCtx);
-      
-      // Draw target circles on vertices
-      targetCtx.strokeStyle = '#ffffff';
-      targetCtx.lineWidth = 1.5;
-      [ {x:x1, y:y1}, {x:x2, y:y2}, {x:x3, y:y3} ].forEach(vertex => {
+        resetGlow(targetCtx);
+        
+      } else if (variantIndex === 2) {
+        // Liquid Morphing circle (Radius shifts by angle)
+        targetCtx.strokeStyle = '#ffffff';
         targetCtx.beginPath();
-        targetCtx.arc(vertex.x, vertex.y, 8, 0, Math.PI * 2);
+        const steps = 60;
+        for (let i = 0; i <= steps; i++) {
+          const a = (i * Math.PI * 2) / steps;
+          const wobbleRadius = R * (0.95 + Math.sin(a * 5 + t * 0.12) * 0.06);
+          targetCtx.lineTo(cx + Math.cos(a) * wobbleRadius, cy + Math.sin(a) * wobbleRadius);
+        }
+        targetCtx.closePath();
         targetCtx.stroke();
-      });
-      
-    } else if (variantIndex === 2) {
-      // Morphing Axis Split (Dynamic Vertex Wobble)
-      const wobbleX = Math.sin(t * 0.08) * 16;
-      const wobbleY = Math.cos(t * 0.06) * 10;
-      
-      const x1 = cx + wobbleX;
-      const y1 = cy - R + wobbleY;
-      const x2 = cx + R * sin60;
-      const y2 = cy + R * cos60;
-      const x3 = cx - R * sin60;
-      const y3 = cy + R * cos60;
-      
-      targetCtx.strokeStyle = '#ffffff';
-      targetCtx.beginPath();
-      targetCtx.moveTo(x1, y1);
-      targetCtx.lineTo(x2, y2);
-      targetCtx.lineTo(x3, y3);
-      targetCtx.closePath();
-      targetCtx.stroke();
-      
-      // Center dividing coordinate axis line
-      targetCtx.strokeStyle = 'rgba(0, 243, 255, 0.4)';
-      targetCtx.setLineDash([2, 5]);
-      targetCtx.beginPath();
-      targetCtx.moveTo(cx, cy - R - 10);
-      targetCtx.lineTo(cx, cy + R + 10);
-      targetCtx.stroke();
-      targetCtx.setLineDash([]);
-      
-    } else if (variantIndex === 3) {
-      // Shattered Frame (Missing side and floating pieces)
-      const x1 = cx;
-      const y1 = cy - R;
-      const x2 = cx + R * sin60;
-      const y2 = cy + R * cos60;
-      const x3 = cx - R * sin60;
-      const y3 = cy + R * cos60;
-      
-      targetCtx.strokeStyle = '#ffffff';
-      
-      // Draw left side
-      targetCtx.beginPath();
-      targetCtx.moveTo(x1, y1);
-      targetCtx.lineTo(x3, y3);
-      targetCtx.stroke();
-      
-      // Draw right side
-      targetCtx.beginPath();
-      targetCtx.moveTo(x1, y1);
-      targetCtx.lineTo(x2, y2);
-      targetCtx.stroke();
-      
-      // Draw incomplete bottom ticks instead of bottom line
-      targetCtx.strokeStyle = 'rgba(0, 243, 255, 0.55)';
-      setGlow(targetCtx, '#00f3ff', 6);
-      const numTicks = 6;
-      for (let i = 0; i <= numTicks; i++) {
-        const px = x3 + (x2 - x3) * (i / numTicks);
+        
+      } else if (variantIndex === 3) {
+        // Shattered circle arc
+        targetCtx.strokeStyle = '#ffffff';
+        // Draw 3/4 circle
         targetCtx.beginPath();
-        targetCtx.moveTo(px, y3 - 4);
-        targetCtx.lineTo(px, y3 + 4);
+        targetCtx.arc(cx, cy, R, 0, Math.PI * 1.6);
         targetCtx.stroke();
+        
+        // Circular shards in the gap
+        targetCtx.strokeStyle = HOUSE_CONFIG.manifestation.colorGlow;
+        setGlow(targetCtx, HOUSE_CONFIG.manifestation.colorGlow, 6);
+        const shardAngleStart = Math.PI * 1.65;
+        const shardAngleEnd = Math.PI * 1.95;
+        const numShards = 3;
+        for (let i = 0; i < numShards; i++) {
+          const stepAngle = shardAngleStart + (shardAngleEnd - shardAngleStart) * (i / (numShards - 1)) + Math.sin(t * 0.08) * 0.02;
+          const dist = R + Math.sin(t * 0.08 + i) * 6;
+          targetCtx.beginPath();
+          targetCtx.arc(cx, cy, dist, stepAngle, stepAngle + 0.06);
+          targetCtx.stroke();
+        }
+        resetGlow(targetCtx);
       }
-      resetGlow(targetCtx);
-      
-      // Floating square tech pieces around the void
-      targetCtx.fillStyle = '#ffffff';
-      for (let i = 0; i < 4; i++) {
-        const px = x3 + (x2 - x3) * ((i + 1) / 5) + Math.sin(t * 0.1 + i) * 5;
-        const py = y3 + 12 + Math.cos(t * 0.1 + i) * 4;
-        targetCtx.fillRect(px - 2, py - 2, 4, 4);
+    }
+    
+    // --- SQUARE Variations (DEVOTION) ---
+    else if (currentHouse === 'devotion') {
+      if (variantIndex === 0) {
+        // Nested rotating squares
+        targetCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        drawRotatingSquare(targetCtx, cx, cy, R * 1.5, R * 1.5, t * 0.012);
+        
+        targetCtx.strokeStyle = HOUSE_CONFIG.devotion.colorGlow;
+        setGlow(targetCtx, HOUSE_CONFIG.devotion.colorGlow, 8);
+        drawRotatingSquare(targetCtx, cx, cy, R * 0.95, R * 0.95, -t * 0.02);
+        resetGlow(targetCtx);
+        
+      } else if (variantIndex === 1) {
+        // Dotted Square border
+        targetCtx.fillStyle = HOUSE_CONFIG.devotion.colorGlow;
+        setGlow(targetCtx, HOUSE_CONFIG.devotion.colorGlow, 8);
+        
+        const S = R * 1.45;
+        const dotsPerSide = 8;
+        const half = S / 2;
+        
+        const drawEdgeDots = (x_s, y_s, dx, dy) => {
+          for (let i = 0; i < dotsPerSide; i++) {
+            targetCtx.beginPath();
+            targetCtx.arc(x_s + dx * (i / dotsPerSide), y_s + dy * (i / dotsPerSide), 2.5, 0, Math.PI * 2);
+            targetCtx.fill();
+          }
+        };
+        
+        drawEdgeDots(cx - half, cy - half, S, 0);  // Top
+        drawEdgeDots(cx + half, cy - half, 0, S);  // Right
+        drawEdgeDots(cx + half, cy + half, -S, 0); // Bottom
+        drawEdgeDots(cx - half, cy + half, 0, -S); // Left
+        resetGlow(targetCtx);
+        
+      } else if (variantIndex === 2) {
+        // Wobble Corners (Pulsing corners)
+        const S = R * 1.45;
+        const half = S / 2;
+        const pulseVal = Math.sin(t * 0.08) * 12;
+        
+        targetCtx.strokeStyle = '#ffffff';
+        targetCtx.beginPath();
+        targetCtx.moveTo(cx - half - pulseVal, cy - half - pulseVal); // TL
+        targetCtx.lineTo(cx + half + pulseVal, cy - half - pulseVal); // TR
+        targetCtx.lineTo(cx + half + pulseVal, cy + half + pulseVal); // BR
+        targetCtx.lineTo(cx - half - pulseVal, cy + half + pulseVal); // BL
+        targetCtx.closePath();
+        targetCtx.stroke();
+        
+      } else if (variantIndex === 3) {
+        // Shattered Square (Missing bottom border)
+        const S = R * 1.45;
+        const half = S / 2;
+        
+        targetCtx.strokeStyle = '#ffffff';
+        targetCtx.beginPath();
+        // Top, left, right edges drawn
+        targetCtx.moveTo(cx - half, cy + half);
+        targetCtx.lineTo(cx - half, cy - half);
+        targetCtx.lineTo(cx + half, cy - half);
+        targetCtx.lineTo(cx + half, cy + half);
+        targetCtx.stroke();
+        
+        // Shattered debris falling below bottom edge
+        targetCtx.fillStyle = HOUSE_CONFIG.devotion.colorGlow;
+        setGlow(targetCtx, HOUSE_CONFIG.devotion.colorGlow, 8);
+        const steps = 4;
+        for (let i = 0; i < steps; i++) {
+          const px = cx - half + S * ((i + 1) / (steps + 1)) + Math.sin(t * 0.15 + i) * 6;
+          const py = cy + half + 14 + Math.cos(t * 0.1 + i) * 4;
+          targetCtx.fillRect(px - 2, py - 2, 4, 4);
+        }
+        resetGlow(targetCtx);
       }
     }
   }
 
   /**
-   * Glitch Distortion Effect
-   * Slices, horizontal shifts, chromatic aberration, and noise artifacts
+   * Chromatic aberration and glitch slices
    */
   function drawGlitchDistortion(targetCtx, t) {
-    // 1. Chromatic Aberration Simulation (RGB Channel Split)
-    // We achieve this by drawing displaced red & blue overlays
     const splitOffset = Math.sin(t * 0.4) * 4;
     
     if (Math.random() < 0.35) {
       targetCtx.globalCompositeOperation = 'screen';
-      
-      // Temporarily draw cyan shifted right
-      targetCtx.fillStyle = 'rgba(0, 243, 255, 0.3)';
+      targetCtx.fillStyle = 'rgba(0, 243, 255, 0.25)';
       targetCtx.fillRect(splitOffset, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-      
-      // Draw red shifted left
-      targetCtx.fillStyle = 'rgba(255, 0, 85, 0.3)';
+      targetCtx.fillStyle = 'rgba(255, 0, 85, 0.25)';
       targetCtx.fillRect(-splitOffset, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-      
       targetCtx.globalCompositeOperation = 'source-over';
     }
 
-    // 2. Horizontal slice offset shift
     const numSlices = Math.floor(Math.random() * 4) + 2;
     for (let i = 0; i < numSlices; i++) {
       const sliceY = Math.floor(Math.random() * CANVAS_HEIGHT);
       const sliceH = Math.floor(Math.random() * 45) + 10;
       const shiftX = (Math.random() - 0.5) * 28;
       
-      // Copy portion of screen and shift it horizontally
       targetCtx.drawImage(
         canvas,
         0, sliceY, CANVAS_WIDTH, sliceH,
@@ -578,19 +990,17 @@ document.addEventListener('DOMContentLoaded', () => {
       );
     }
 
-    // 3. Draw chaotic binary tech text / status logs in background
     if (Math.random() < 0.4) {
-      targetCtx.fillStyle = 'rgba(0, 243, 255, 0.35)';
+      targetCtx.fillStyle = 'rgba(255, 255, 255, 0.25)';
       targetCtx.font = "8px 'Share Tech Mono'";
       targetCtx.fillText("SYS_ENTROPY: OVERLOAD", 15, Math.random() * CANVAS_HEIGHT);
       targetCtx.fillText("BX-COLLAPSE_INCOMING_VECTOR", 320, Math.random() * CANVAS_HEIGHT);
     }
 
-    // 4. Glitchy horizontal lightning beams
     const numLines = Math.floor(Math.random() * 3);
     for (let i = 0; i < numLines; i++) {
-      targetCtx.strokeStyle = Math.random() > 0.5 ? '#ffffff' : '#00f3ff';
-      targetCtx.lineWidth = Math.random() * 2;
+      targetCtx.strokeStyle = Math.random() > 0.5 ? '#ffffff' : 'var(--color-cyan)';
+      targetCtx.lineWidth = Math.random() * 1.5;
       const lineY = Math.random() * CANVAS_HEIGHT;
       targetCtx.beginPath();
       targetCtx.moveTo(0, lineY);
@@ -599,78 +1009,85 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // --- Active Draw Router for Core Houses ---
+  function drawHouseCoreSigil(targetCtx, houseKey, sigilIndex, scale = 1, t = 0) {
+    if (houseKey === 'chance') {
+      if (sigilIndex === 0) drawBanish(targetCtx, scale, t);
+      else if (sigilIndex === 1) drawRisk(targetCtx, scale, t);
+      else drawSummon(targetCtx, scale, t);
+    } else if (houseKey === 'manifestation') {
+      if (sigilIndex === 0) drawVision(targetCtx, scale, t);
+      else if (sigilIndex === 1) drawFocus(targetCtx, scale, t);
+      else drawAlign(targetCtx, scale, t);
+    } else if (houseKey === 'devotion') {
+      if (sigilIndex === 0) drawAnchor(targetCtx, scale, t);
+      else if (sigilIndex === 1) drawSacrifice(targetCtx, scale, t);
+      else drawSanctuary(targetCtx, scale, t);
+    }
+  }
+
   // --- Game Loop Implementation ---
 
   function runEntropyEngine() {
     time += entropySpeed;
     
-    // Clear canvas
     clearCanvas(ctx);
 
     if (isCollapsing) {
-      // High-speed visual chaos cycle during collapse
-      const tempState = Math.floor(Math.random() * 7); // 0-2: core sigils, 3-6: variations
-      if (tempState === 0) drawBanish(ctx, 1.05, time);
-      else if (tempState === 1) drawRisk(ctx, 1.05, time);
-      else if (tempState === 2) drawReceive(ctx, 1.05, time);
-      else drawEntropyVariation(ctx, tempState - 3, 1.05, time);
-      
+      // Rapid visual cycle through all available geometry configurations during collapse
+      const tempState = Math.floor(Math.random() * 7);
+      if (tempState < 3) {
+        drawHouseCoreSigil(ctx, currentHouse, tempState, 1.05, time);
+      } else {
+        drawEntropyVariation(ctx, tempState - 3, 1.05, time);
+      }
       drawGlitchDistortion(ctx, time);
       
     } else if (isCollapsed) {
-      // Locked state: slow pulse and very occasional micro-glitches
       const pulse = 1.0 + Math.sin(time * 0.04) * 0.02;
-      
-      if (collapsedSigilIndex === 0) {
-        drawBanish(ctx, pulse, time);
-      } else if (collapsedSigilIndex === 1) {
-        drawRisk(ctx, pulse, time);
-      } else {
-        drawReceive(ctx, pulse, time);
-      }
+      drawHouseCoreSigil(ctx, currentHouse, collapsedSigilIndex, pulse, time);
 
-      // Micro-glitch event: 1.5% chance per frame
       if (Math.random() < 0.015) {
         drawGlitchDistortion(ctx, time);
       }
 
     } else {
-      // Normal Loop State Routing (10-Phase High-Tempo Visual Cycle)
+      // 10-Phase High-Tempo Visual Loop Cycle
       const totalCycleDuration = 5 * LOOP_TIMINGS.stateDuration + 5 * LOOP_TIMINGS.glitchDuration;
       const currentTimeMs = (Date.now()) % totalCycleDuration;
 
       let acc = 0;
 
-      // Phase 01: Core BANISH
+      // Phase 01: Core Sigil 01
       if (currentTimeMs < LOOP_TIMINGS.stateDuration) {
-        drawBanish(ctx, 1.0, time);
+        drawHouseCoreSigil(ctx, currentHouse, 0, 1.0, time);
       } 
-      // Phase 02: Core BANISH + Glitch
+      // Phase 02: Core Sigil 01 + Glitch
       else if (currentTimeMs < (acc = LOOP_TIMINGS.stateDuration + LOOP_TIMINGS.glitchDuration)) {
-        drawBanish(ctx, 1.0, time);
+        drawHouseCoreSigil(ctx, currentHouse, 0, 1.0, time);
         drawGlitchDistortion(ctx, time);
       }
-      // Phase 03: Intermediate Variation 0 (Nested Orbit)
+      // Phase 03: Intermediate Variant 0
       else if (currentTimeMs < (acc += LOOP_TIMINGS.stateDuration)) {
         drawEntropyVariation(ctx, 0, 1.0, time);
       }
-      // Phase 04: Intermediate Variation 0 + Glitch
+      // Phase 04: Intermediate Variant 0 + Glitch
       else if (currentTimeMs < (acc += LOOP_TIMINGS.glitchDuration)) {
         drawEntropyVariation(ctx, 0, 1.0, time);
         drawGlitchDistortion(ctx, time);
       }
-      // Phase 05: Core RISK
+      // Phase 05: Core Sigil 02
       else if (currentTimeMs < (acc += LOOP_TIMINGS.stateDuration)) {
-        drawRisk(ctx, 1.0, time);
+        drawHouseCoreSigil(ctx, currentHouse, 1, 1.0, time);
       }
-      // Phase 06: Core RISK + Glitch
+      // Phase 06: Core Sigil 02 + Glitch
       else if (currentTimeMs < (acc += LOOP_TIMINGS.glitchDuration)) {
-        drawRisk(ctx, 1.0, time);
+        drawHouseCoreSigil(ctx, currentHouse, 1, 1.0, time);
         drawGlitchDistortion(ctx, time);
       }
-      // Phase 07: Dynamic intermediate variations 1, 2, 3 (Grid / Morph / Shattered)
+      // Phase 07: Dynamic intermediate variations 1, 2, 3
       else if (currentTimeMs < (acc += LOOP_TIMINGS.stateDuration)) {
-        const variantCycle = (Math.floor(time / 15) % 3) + 1; // Cycle through variations 1, 2, 3
+        const variantCycle = (Math.floor(time / 15) % 3) + 1;
         drawEntropyVariation(ctx, variantCycle, 1.0, time);
       }
       // Phase 08: Dynamic intermediate variations + Glitch
@@ -679,13 +1096,13 @@ document.addEventListener('DOMContentLoaded', () => {
         drawEntropyVariation(ctx, variantCycle, 1.0, time);
         drawGlitchDistortion(ctx, time);
       }
-      // Phase 09: Core RECEIVE
+      // Phase 09: Core Sigil 03 (Summon/Align/Sanctuary)
       else if (currentTimeMs < (acc += LOOP_TIMINGS.stateDuration)) {
-        drawReceive(ctx, 1.0, time);
+        drawHouseCoreSigil(ctx, currentHouse, 2, 1.0, time);
       }
-      // Phase 10: Core RECEIVE + Glitch
+      // Phase 10: Core Sigil 03 + Glitch
       else {
-        drawReceive(ctx, 1.0, time);
+        drawHouseCoreSigil(ctx, currentHouse, 2, 1.0, time);
         drawGlitchDistortion(ctx, time);
       }
     }
@@ -697,7 +1114,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   /**
    * Action 1: FREEZE THE FLOW
-   * Collapse the active visual loop into one of the 3 states
    */
   btnFreeze.addEventListener('click', () => {
     if (isCollapsed || isCollapsing) return;
@@ -705,28 +1121,24 @@ document.addEventListener('DOMContentLoaded', () => {
     isCollapsing = true;
     btnFreeze.disabled = true;
     
-    // Visual indicator updates
     statusText.textContent = "DECRYPTION ACTIVE";
     statusText.classList.add('locked');
     statusDot.classList.remove('pulsing');
     statusDot.classList.add('locked');
 
-    // Simulate collapse compression sequence
     setTimeout(() => {
       isCollapsing = false;
       isCollapsed = true;
       btnFreeze.disabled = false;
 
-      // 1. Choose collapsed Sigil via "Bet with the Universe" random distribution
+      // Settle on one of the 3 active sigils
       collapsedSigilIndex = Math.floor(Math.random() * 3);
-      const chosenSigil = SIGIL_DATA[collapsedSigilIndex];
+      const chosenSigil = HOUSE_CONFIG[currentHouse].sigilData[collapsedSigilIndex];
 
-      // 2. Generate cryptographically mapped receipt metadata
-      const { seed, fullCode, displayHash } = generateSeedAndHash(chosenSigil.id);
+      const { seed, fullCode, displayHash } = generateSeedAndHash(HOUSE_CONFIG[currentHouse].seedPrefix, chosenSigil.id);
       seedCode = seed;
       fullFulfillmentCode = fullCode;
 
-      // 3. Inject details into Static Receipt Card elements
       receiptSigilName.textContent = chosenSigil.name;
       receiptSigilDesc.textContent = chosenSigil.desc;
       receiptSigilDirective.textContent = chosenSigil.directive;
@@ -736,25 +1148,21 @@ document.addEventListener('DOMContentLoaded', () => {
       const now = new Date();
       receiptTimestamp.textContent = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
 
-      // 4. Reveal Receipt, Hide Invitation with clean fade animation
       cardInvitation.classList.add('hidden');
       cardReceipt.classList.remove('hidden');
 
-      // Update HUD status label
       statusText.textContent = "BX SECURE COLLAPSE";
 
-    }, 850); // Duration of collapse sequence
+    }, 850);
   });
 
   /**
    * Action 2: RELEASE TO FLOW
-   * Resets locked state back to fast looping entropy engine
    */
   btnRelease.addEventListener('click', () => {
     isCollapsed = false;
     isCollapsing = false;
     
-    // UI state restores
     cardReceipt.classList.add('hidden');
     cardInvitation.classList.remove('hidden');
     
@@ -764,65 +1172,92 @@ document.addEventListener('DOMContentLoaded', () => {
     statusDot.classList.remove('locked');
   });
 
-  // --- GIF Compiler Engine using GifShot ---
+  /**
+   * Action 3: HOUSE TAB SWITCHING
+   */
+  document.querySelectorAll('.house-tab').forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      const selectedHouse = e.target.getAttribute('data-house');
+      if (selectedHouse === currentHouse) return;
+
+      // 1. Release active collapsed state if changing houses
+      isCollapsed = false;
+      isCollapsing = false;
+      cardReceipt.classList.add('hidden');
+      cardExport.classList.add('hidden');
+      cardProcessing.classList.add('hidden');
+      cardInvitation.classList.remove('hidden');
+      
+      statusText.textContent = "ENTROPY ACTIVE";
+      statusText.classList.remove('locked');
+      statusDot.classList.add('pulsing');
+      statusDot.classList.remove('locked');
+
+      // 2. Adjust active tab CSS highlights
+      document.querySelectorAll('.house-tab').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+
+      // 3. Set body class selector to trigger CSS transitions
+      document.body.className = HOUSE_CONFIG[selectedHouse].themeClass;
+
+      // 4. Update memory parameters
+      currentHouse = selectedHouse;
+
+      // 5. Update HTML text components dynamically
+      const activeHouse = HOUSE_CONFIG[selectedHouse];
+      hudHouseTitle.textContent = activeHouse.title;
+      inviteQuote.textContent = activeHouse.inviteQuote;
+      inviteInstruction.textContent = activeHouse.inviteInstruction;
+    });
+  });
+
+  // --- GIF Compiler Engine ---
 
   btnGif.addEventListener('click', () => {
     if (!isCollapsed) return;
 
-    // Transition panels
     cardReceipt.classList.add('hidden');
     cardProcessing.classList.remove('hidden');
     
-    // Reset Progress indicators
     loaderProgressBar.style.width = '0%';
     loaderPercent.textContent = '0%';
     loaderStatus.textContent = 'PREPARING MATRIX FRAMEWORKS...';
 
-    // 1. Instantiate Offscreen Canvas (prevents rendering directly on visible screen)
     const offscreen = document.createElement('canvas');
     offscreen.width = 400;
     offscreen.height = 400;
     const octx = offscreen.getContext('2d', { willReadFrequently: true });
     
     const frameImages = [];
-    const numFrames = 15; // 1.5 second loop at 10 fps
+    const numFrames = 15;
     
-    // Temporarily disable main draw rendering speed
     loaderProgressBar.style.width = '10%';
     loaderPercent.textContent = '10%';
     loaderStatus.textContent = 'CAPTURING GEOMETRIC CYCLES...';
 
-    // 2. Offscreen Canvas Drawing loop to capture pulses and subtle glitches
+    const activeHouse = HOUSE_CONFIG[currentHouse];
+
     for (let f = 0; f < numFrames; f++) {
       clearCanvas(octx);
       
-      // Calculate pulsing values
       const progress = f / numFrames;
       const angle = progress * Math.PI * 2;
-      const scale = 0.90 + Math.sin(angle) * 0.05; // Gentle pulse in GIF card
+      const scale = 0.90 + Math.sin(angle) * 0.05;
       const mockTime = f * 3.5;
       
-      // Draw standard sigil shapes
-      if (collapsedSigilIndex === 0) {
-        drawBanish(octx, scale, mockTime);
-      } else if (collapsedSigilIndex === 1) {
-        drawRisk(octx, scale, mockTime);
-      } else {
-        drawReceive(octx, scale, mockTime);
-      }
+      // Draw dynamic pulses for the specific collapsed sigil in offscreen
+      drawHouseCoreSigil(octx, currentHouse, collapsedSigilIndex, scale, mockTime);
 
-      // Add a single heavy glitch frame inside the GIF loop for aesthetic authenticity
+      // Glitch frame overlay for tech aesthetic
       if (f === 5 || f === 12) {
-        // Draw chromatic RGB shifts
         octx.globalCompositeOperation = 'screen';
-        octx.fillStyle = 'rgba(0, 243, 255, 0.45)';
+        octx.fillStyle = `rgba(${currentHouse === 'chance' ? '0, 243, 255' : currentHouse === 'manifestation' ? '255, 183, 0' : '255, 0, 127'}, 0.45)`;
         octx.fillRect(3, 0, 400, 400);
         octx.fillStyle = 'rgba(255, 0, 85, 0.45)';
         octx.fillRect(-3, 0, 400, 400);
         octx.globalCompositeOperation = 'source-over';
         
-        // Draw glitch lines
-        octx.strokeStyle = '#00f3ff';
+        octx.strokeStyle = activeHouse.colorGlow;
         octx.lineWidth = 1.5;
         octx.beginPath();
         octx.moveTo(0, 180); octx.lineTo(400, 180);
@@ -830,7 +1265,7 @@ document.addEventListener('DOMContentLoaded', () => {
         octx.stroke();
       }
 
-      // 3. Render Card Metadata overlay (Seed, code text, stamp frame) directly in GIF!
+      // Draw custom bounding frame
       octx.strokeStyle = 'rgba(255,255,255,0.06)';
       octx.lineWidth = 1;
       octx.strokeRect(10, 10, 380, 380);
@@ -839,13 +1274,12 @@ document.addEventListener('DOMContentLoaded', () => {
       octx.fillStyle = 'rgba(255,255,255,0.2)';
       octx.font = "8px 'Share Tech Mono'";
       octx.textAlign = 'left';
-      octx.fillText("DEC: BX-CHNC-SECURE-STABLE", 20, 380);
+      octx.fillText(`DEC: BX-${activeHouse.name}-SECURE-STABLE`, 20, 380);
       
       octx.textAlign = 'right';
-      octx.fillStyle = '#00f3ff';
+      octx.fillStyle = activeHouse.colorGlow;
       octx.fillText(fullFulfillmentCode, 380, 380);
       
-      // Store the frame data URL
       frameImages.push(offscreen.toDataURL('image/png'));
     }
 
@@ -853,14 +1287,12 @@ document.addEventListener('DOMContentLoaded', () => {
     loaderPercent.textContent = '30%';
     loaderStatus.textContent = 'COMPILING ENCODERS...';
 
-    // 4. Trigger Web Workers using Yahoo's gifshot.js library
     gifshot.createGIF({
       images: frameImages,
       gifWidth: 400,
       gifHeight: 400,
       interval: 0.1, // 100ms per frame
       progressCallback: (progressPercent) => {
-        // gifshot returns a float from 0.0 to 1.0 representing render progress
         const computedPercent = Math.min(99, Math.round(30 + progressPercent * 70));
         loaderProgressBar.style.width = `${computedPercent}%`;
         loaderPercent.textContent = `${computedPercent}%`;
@@ -871,26 +1303,20 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('GIF Generation Error:', obj.error);
         alert(`Compilation Error: ${obj.error}`);
         
-        // Reset view back to receipt
         cardProcessing.classList.add('hidden');
         cardReceipt.classList.remove('hidden');
         return;
       }
 
-      // Success callback
       loaderProgressBar.style.width = '100%';
       loaderPercent.textContent = '100%';
       loaderStatus.textContent = 'COMPILATION COMPLETE!';
 
       setTimeout(() => {
-        // Set image source preview
         gifPreview.src = obj.image;
-        
-        // Setup download link href and specific dynamic filename
         downloadGifLink.href = obj.image;
-        downloadGifLink.download = `BLEXX_${seedCode}_${SIGIL_DATA[collapsedSigilIndex].id}.gif`;
+        downloadGifLink.download = `BLEXX_${seedCode}_${activeHouse.sigilData[collapsedSigilIndex].id}.gif`;
 
-        // Switch panel to Export View
         cardProcessing.classList.add('hidden');
         cardExport.classList.remove('hidden');
       }, 500);

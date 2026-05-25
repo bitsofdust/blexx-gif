@@ -28,6 +28,38 @@
   --transition-smooth: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* --- House Theme Overrides --- */
+body.house-chance {
+  --color-cyan: #00f3ff;
+  --color-cyan-glow: rgba(0, 243, 255, 0.4);
+}
+
+body.house-manifestation {
+  --color-cyan: #ffb700;
+  --color-cyan-glow: rgba(255, 183, 0, 0.45);
+  --color-panel-border-hover: rgba(255, 183, 0, 0.25);
+}
+
+body.house-devotion {
+  --color-cyan: #ff007f;
+  --color-cyan-glow: rgba(255, 0, 127, 0.45);
+  --color-panel-border-hover: rgba(255, 0, 127, 0.25);
+}
+
+body.house-manifestation .ambient-glow.cyan {
+  background: radial-gradient(circle, #ffb700 0%, transparent 70%);
+}
+body.house-manifestation .status-indicator {
+  border-color: rgba(255, 183, 0, 0.15);
+}
+
+body.house-devotion .ambient-glow.cyan {
+  background: radial-gradient(circle, #ff007f 0%, transparent 70%);
+}
+body.house-devotion .status-indicator {
+  border-color: rgba(255, 0, 127, 0.15);
+}
+
 /* --- Base Resets & Structure --- */
 * {
   box-sizing: border-box;
@@ -116,6 +148,41 @@ body {
   border-bottom: 1px solid var(--color-panel-border);
   padding-bottom: 20px;
   margin-bottom: 24px;
+}
+
+/* --- House Switcher Tab Group --- */
+.house-switcher {
+  display: flex;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--color-panel-border);
+  border-radius: 20px;
+  padding: 3px;
+  gap: 4px;
+}
+
+.house-tab {
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 6px 18px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.house-tab:hover {
+  color: var(--color-white);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.house-tab.active {
+  color: var(--color-bg);
+  background: var(--color-cyan);
+  box-shadow: 0 0 14px var(--color-cyan-glow);
 }
 
 .hud-tag {

@@ -30,8 +30,16 @@
     <header class="hud-header">
       <div class="header-logo-group">
         <span class="hud-tag font-mono">PROJECT BLEXX</span>
-        <h1 class="hud-title">TRIANGLE HOUSE OF CHANCE</h1>
+        <h1 class="hud-title" id="hud-house-title">TRIANGLE HOUSE OF CHANCE</h1>
       </div>
+      
+      <!-- Futuristic House Switcher Tab Group -->
+      <div class="house-switcher font-mono">
+        <button class="house-tab active" data-house="chance">CHANCE</button>
+        <button class="house-tab" data-house="manifestation">MANIFESTATION</button>
+        <button class="house-tab" data-house="devotion">DEVOTION</button>
+      </div>
+
       <div class="hud-status-group">
         <div class="status-indicator">
           <span class="status-dot pulsing" id="status-dot"></span>
@@ -65,8 +73,8 @@
         <div class="control-card glass-panel" id="invitation-card">
           <h2 class="card-title font-mono">// THE INVITATION</h2>
           <div class="narrative-block">
-            <p class="invite-quote">"The door is never where you left it. In the House of Chance, we do not build paths; we step into the wind."</p>
-            <p class="invite-instruction">
+            <p class="invite-quote" id="invite-quote">"The door is never where you left it. In the House of Chance, we do not build paths; we step into the wind."</p>
+            <p class="invite-instruction" id="invite-instruction">
               Stop measuring the distance. Release your grip on the "how" and the "when." To capture your digital Blexxing, initiate the collapse vector below.
             </p>
           </div>
