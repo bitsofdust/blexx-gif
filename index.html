@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="BLEXX Digital Blexxing Engine - Triangle House of Chance. Embrace uncertainty, freeze the flow, and harvest your unique cryptographic sigil and animated GIF card.">
+  <title>BLEXX // Digital Blexxing Engine</title>
+  
+  <!-- Modern Typography from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Core Design System -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Client-side Animated GIF Compilation Library -->
+  <script src="https://unpkg.com/gifshot@0.3.2/dist/gifshot.min.js"></script>
+</head>
+<body>
+
+  <!-- Glowing background elements for dark theme depth -->
+  <div class="ambient-glow cyan"></div>
+  <div class="ambient-glow purple"></div>
+  <div class="grid-overlay"></div>
+
+  <div id="app" class="app-container">
+    
+    <!-- Top HUD Header -->
+    <header class="hud-header">
+      <div class="header-logo-group">
+        <span class="hud-tag font-mono">PROJECT BLEXX</span>
+        <h1 class="hud-title">TRIANGLE HOUSE OF CHANCE</h1>
+      </div>
+      <div class="hud-status-group">
+        <div class="status-indicator">
+          <span class="status-dot pulsing" id="status-dot"></span>
+          <span class="status-text font-mono" id="status-text">ENTROPY ACTIVE</span>
+        </div>
+        <div class="system-time font-mono" id="system-time">00:00:00 UTC</div>
+      </div>
+    </header>
+
+    <!-- Main Workspace Grid -->
+    <main class="workspace-grid">
+      
+      <!-- Visual Display Section -->
+      <section class="display-section card-glow">
+        <div class="corner-bracket top-left"></div>
+        <div class="corner-bracket top-right"></div>
+        <div class="corner-bracket bottom-left"></div>
+        <div class="corner-bracket bottom-right"></div>
+        
+        <div class="canvas-viewport" id="viewport">
+          <canvas id="entropy-canvas" width="500" height="500"></canvas>
+          <div class="scanlines"></div>
+          <div class="vignette"></div>
+        </div>
+      </section>
+
+      <!-- Control Center Section -->
+      <section class="control-section">
+        
+        <!-- The Invitation / Instructions -->
+        <div class="control-card glass-panel" id="invitation-card">
+          <h2 class="card-title font-mono">// THE INVITATION</h2>
+          <div class="narrative-block">
+            <p class="invite-quote">"The door is never where you left it. In the House of Chance, we do not build paths; we step into the wind."</p>
+            <p class="invite-instruction">
+              Stop measuring the distance. Release your grip on the "how" and the "when." To capture your digital Blexxing, initiate the collapse vector below.
+            </p>
+          </div>
+          
+          <!-- Primary Action Button -->
+          <button id="freeze-btn" class="cyber-btn trigger-glow">
+            <span class="btn-text">FREEZE THE FLOW</span>
+            <span class="btn-glitch-overlay"></span>
+            <span class="btn-bracket font-mono">[COLLAPSE]</span>
+          </button>
+        </div>
+
+        <!-- The Static Receipt Card (revealed upon freeze) -->
+        <div class="control-card glass-panel hidden" id="receipt-card">
+          <div class="receipt-header">
+            <span class="receipt-tag font-mono">DIGITAL BLEXXING ARCHIVE</span>
+            <h2 class="receipt-title" id="receipt-sigil-name">01 BANISH</h2>
+          </div>
+          
+          <div class="receipt-body">
+            <!-- Dynamic Sigil Narrative -->
+            <div class="sigil-meta-block">
+              <div class="meta-label font-mono">NARRATIVE FUNCTION:</div>
+              <p class="sigil-description" id="receipt-sigil-desc">Active extraction. Purging pre-calculated patterns to generate clear runway area for external chaos.</p>
+            </div>
+            
+            <div class="sigil-meta-block">
+              <div class="meta-label font-mono">SYSTEM DIRECTIVE:</div>
+              <p class="sigil-directive" id="receipt-sigil-directive">Pushing back historical stability mechanics to welcome high-variance events.</p>
+            </div>
+
+            <!-- Cryptographic Details -->
+            <div class="crypt-details glass-sub-panel font-mono">
+              <div class="detail-row">
+                <span class="label">SEED CODE:</span>
+                <span class="value cyan-text" id="receipt-seed">BX-CHNC-7F8A1E-BNSH</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">EST. ENTROPY:</span>
+                <span class="value">99.84% VARIANCE</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">TIMESTAMP:</span>
+                <span class="value" id="receipt-timestamp">2026-05-25 15:30:00 UTC</span>
+              </div>
+              <div class="detail-row">
+                <span class="label">SECURE HASH:</span>
+                <span class="value truncated-hash" id="receipt-hash">F82D3A...E92F</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Checkout Notification Banner -->
+          <div class="checkout-banner font-mono">
+            <div class="banner-border"></div>
+            <span class="banner-icon">⚠</span>
+            <span class="banner-text">PENDANT MATCHING ELIGIBLE ON CHECKOUT</span>
+          </div>
+
+          <!-- Post-Collapse Actions -->
+          <div class="receipt-actions">
+            <button id="gif-btn" class="cyber-btn action-glow text-cyan">
+              <span class="btn-text">COMPILE ANIMATED GIF</span>
+              <span class="btn-bracket font-mono">[HARVEST]</span>
+            </button>
+            <button id="release-btn" class="cyber-btn outline-btn font-mono">
+              RELEASE TO FLOW
+            </button>
+          </div>
+        </div>
+
+        <!-- GIF Processing Overlay -->
+        <div class="control-card glass-panel hidden" id="processing-card">
+          <h2 class="card-title font-mono">// COMPILING GEOMETRY</h2>
+          <div class="processing-loader">
+            <div class="glitch-loader-bar">
+              <div class="loader-progress" id="loader-progress-bar" style="width: 0%;"></div>
+            </div>
+            <div class="loader-labels font-mono">
+              <span id="loader-status">ENCODING ANIMATION LOOPS...</span>
+              <span id="loader-percent">0%</span>
+            </div>
+          </div>
+          <div class="receipt-body">
+            <p class="processing-hint font-mono">Using browser-level multi-threaded workers to compile digital sigil variants with static receipt overlay. Please wait.</p>
+          </div>
+        </div>
+
+        <!-- GIF Export / Download Card -->
+        <div class="control-card glass-panel hidden" id="export-card">
+          <h2 class="card-title font-mono">// TRANSMISSION READY</h2>
+          <div class="export-preview-container">
+            <img id="gif-preview" class="gif-preview-img" src="" alt="BLEXX Animated Sigil Preview">
+          </div>
+          <div class="export-actions">
+            <a id="download-gif-link" class="cyber-btn action-glow text-green" href="" download="BLEXX_BLEXXING.gif">
+              <span class="btn-text">DOWNLOAD GIF</span>
+              <span class="btn-bracket font-mono">[SAVE]</span>
+            </a>
+            <button id="export-back-btn" class="cyber-btn outline-btn font-mono">
+              BACK TO RECEIPT
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Footer Meta -->
+    <footer class="app-footer font-mono">
+      <div class="footer-left">BLEXX CLIENT V2.8.1 // THOC INSTANCE</div>
+      <div class="footer-right">© PROJECT BLEXX // ELECTROMAGNETIC UNCERTAINTY IS VALUE</div>
+    </footer>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
