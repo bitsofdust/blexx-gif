@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const receiptSigilDesc = document.getElementById('receipt-sigil-desc');
   const receiptSigilDirective = document.getElementById('receipt-sigil-directive');
   const receiptSeed = document.getElementById('receipt-seed');
+  const receiptEntropy = document.getElementById('receipt-entropy');
   const receiptTimestamp = document.getElementById('receipt-timestamp');
   const receiptHash = document.getElementById('receipt-hash');
   
@@ -1144,6 +1145,9 @@ document.addEventListener('DOMContentLoaded', () => {
       receiptSigilDirective.textContent = chosenSigil.directive;
       receiptSeed.textContent = fullCode;
       receiptHash.textContent = displayHash;
+      
+      const entropy = (95.00 + Math.random() * 4.99).toFixed(2);
+      receiptEntropy.textContent = `${entropy}% VARIANCE`;
       
       const now = new Date();
       receiptTimestamp.textContent = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
