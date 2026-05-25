@@ -177,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let entropySpeed = 1;
   let seedCode = "";
   let fullFulfillmentCode = "";
+  let fullSecureHash = "";
 
   // --- Geolocation State & Resolver ---
   let userLocation = "SECURE NODE";
@@ -253,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const displayHash = `${hash.substring(0, 8)}...${hash.substring(24, 32)}`;
     
-    return { seed, fullCode, displayHash };
+    return { seed, fullCode, displayHash, hash };
   }
 
   // --- Dynamic Canvas Render Functions ---
@@ -1206,9 +1207,10 @@ document.addEventListener('DOMContentLoaded', () => {
       collapsedSigilIndex = Math.floor(Math.random() * 3);
       const chosenSigil = HOUSE_CONFIG[currentHouse].sigilData[collapsedSigilIndex];
 
-      const { seed, fullCode, displayHash } = generateSeedAndHash(HOUSE_CONFIG[currentHouse].seedPrefix, chosenSigil.id);
+      const { seed, fullCode, displayHash, hash } = generateSeedAndHash(HOUSE_CONFIG[currentHouse].seedPrefix, chosenSigil.id);
       seedCode = seed;
       fullFulfillmentCode = fullCode;
+      fullSecureHash = hash;
 
       receiptSigilName.textContent = chosenSigil.name;
       receiptSigilDesc.textContent = chosenSigil.desc;
@@ -1413,7 +1415,7 @@ document.addEventListener('DOMContentLoaded', () => {
             seed: seedCode,
             fulfillmentCode: fullFulfillmentCode,
             entropy: parseFloat(document.getElementById('receipt-entropy').textContent) || 99.84,
-            hash: receiptHash.textContent,
+            hash: fullSecureHash,
             gifUrl: downloadURL,
             location: userLocation,
             timestamp: serverTimestamp()
@@ -1431,7 +1433,7 @@ document.addEventListener('DOMContentLoaded', () => {
 `I have bound the sacred pattern in the House of ${activeHouse.name}!
 
 Sealed Sigil: ${fullFulfillmentCode}
-Secure Hash: ${receiptHash.textContent}
+Secure Hash: ${fullSecureHash}
 
 🔗 View my live animated Blexxing here:
 ${downloadURL}
@@ -1449,7 +1451,7 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
 `I have bound the sacred pattern in the House of ${activeHouse.name}!
 
 Sealed Sigil: ${fullFulfillmentCode}
-Secure Hash: ${receiptHash.textContent}
+Secure Hash: ${fullSecureHash}
 
 ⚡ [Tip: Drag and drop or copy-paste your downloaded Blexxing file directly into this email to share the pulsing animation!]
 
