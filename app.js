@@ -1228,7 +1228,11 @@ document.addEventListener('DOMContentLoaded', () => {
       receiptEntropy.textContent = `${entropy}% VARIANCE`;
       
       const now = new Date();
-      receiptTimestamp.textContent = now.toISOString().replace('T', ' ').substring(0, 19) + ' UTC';
+      const mm = String(now.getUTCMonth() + 1).padStart(2, '0');
+      const dd = String(now.getUTCDate()).padStart(2, '0');
+      const yyyy = now.getUTCFullYear();
+      const utcTime = now.toISOString().substring(11, 19);
+      receiptTimestamp.textContent = `${mm}-${dd}-${yyyy} ${utcTime} UTC`;
 
       cardInvitation.classList.add('hidden');
       cardReceipt.classList.remove('hidden');
@@ -1310,6 +1314,12 @@ document.addEventListener('DOMContentLoaded', () => {
     loaderProgressBar.style.width = '15%';
     loaderPercent.textContent = '15%';
     loaderStatus.textContent = 'CAPTURING GEOMETRIC CYCLES...';
+
+    const compileDate = new Date();
+    const mmLocal = String(compileDate.getMonth() + 1).padStart(2, '0');
+    const ddLocal = String(compileDate.getDate()).padStart(2, '0');
+    const yyyyLocal = compileDate.getFullYear();
+    const dateStr = `${mmLocal}-${ddLocal}-${yyyyLocal}`;
 
     const offscreen = document.createElement('canvas');
     offscreen.width = 1050;
@@ -1428,10 +1438,10 @@ document.addEventListener('DOMContentLoaded', () => {
         octx.fillStyle = activeHouse.colorGlow;
         octx.fillText(`HOUSE: ${activeHouse.name.toUpperCase()}`, marginX + frameW - 20, marginY + 35);
         
-        // Bottom Left: SIGIL: [NAME]
+        // Bottom Left: SIGIL: [NAME] // DATE: [XX-XX-XXXX]
         octx.textAlign = 'left';
         octx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-        octx.fillText(`SIGIL: ${activeHouse.sigilData[collapsedSigilIndex].name.toUpperCase()}`, marginX + 20, marginY + frameH - 20);
+        octx.fillText(`SIGIL: ${activeHouse.sigilData[collapsedSigilIndex].name.toUpperCase()} // DATE: ${dateStr}`, marginX + 20, marginY + frameH - 20);
         
         // Bottom Right: [FULL FULFILLMENT CODE]
         octx.textAlign = 'right';
@@ -1588,7 +1598,15 @@ Generate your own digital Blexxing here: https://bitsofdust.github.io/blexx-gif/
           <div class="feed-card-header font-mono">
             <span class="feed-house ${houseColorClass}">HOUSE: ${data.house.toUpperCase()}</span>
             <span class="feed-location font-mono">[${data.location || 'SECURE NODE'}]</span>
-            <span class="feed-time">${data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleTimeString() : 'RECENT'}</span>
+            <span class="feed-time">
+              ${data.timestamp ? (() => {
+                const d = new Date(data.timestamp.seconds * 1000);
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                const yyyy = d.getFullYear();
+                return `${mm}-${dd}-${yyyy} ${d.toLocaleTimeString()}`;
+              })() : 'RECENT'}
+            </span>
           </div>
           <div class="feed-card-body">
             <div class="feed-thumbnail-wrapper">
