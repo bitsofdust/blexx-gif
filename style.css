@@ -185,12 +185,77 @@ body {
   box-shadow: 0 0 14px var(--color-cyan-glow);
 }
 
-.hud-tag {
+.header-logo-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.logo-icon {
+  height: 24px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 5px var(--color-cyan-glow));
+  transition: filter var(--transition-smooth);
+}
+
+.logo-wordmark {
+  height: 14px;
+  width: auto;
+  object-fit: contain;
+  filter: invert(1);
+  opacity: 0.95;
+}
+
+.logo-divider {
+  color: rgba(255, 255, 255, 0.2);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+.logo-secure {
   color: var(--color-text-secondary);
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
-  display: block;
-  margin-bottom: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+}
+
+/* --- Receipt Card Logo Wrap --- */
+.receipt-logo-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.receipt-logo-icon {
+  height: 20px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px var(--color-cyan-glow));
+}
+
+.receipt-logo-wordmark {
+  height: 12px;
+  width: auto;
+  object-fit: contain;
+  filter: invert(1);
+  opacity: 0.95;
+}
+
+/* Light background contrast controls for white receipt cards (Devotion and Manifestation) */
+body.house-manifestation.state-sealed .receipt-logo-wordmark,
+body.house-devotion.state-sealed .receipt-logo-wordmark {
+  filter: none;
+  opacity: 0.85;
 }
 
 .hud-title {

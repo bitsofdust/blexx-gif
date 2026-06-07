@@ -30,6 +30,29 @@ const storage = getStorage(firebaseApp);
 // --- Utility Helpers ---
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
+const loadImage = src => new Promise(resolve => {
+  const img = new Image();
+  img.onload = () => resolve(img);
+  img.onerror = () => {
+    console.error(`Failed to load brand asset: ${src}`);
+    resolve(null);
+  };
+  img.src = src;
+});
+
+const drawTintedImage = (targetCtx, img, x, y, width, height, color) => {
+  if (!img) return;
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = width;
+  tempCanvas.height = height;
+  const tempCtx = tempCanvas.getContext('2d');
+  tempCtx.drawImage(img, 0, 0, width, height);
+  tempCtx.globalCompositeOperation = 'source-in';
+  tempCtx.fillStyle = color;
+  tempCtx.fillRect(0, 0, width, height);
+  targetCtx.drawImage(tempCanvas, x, y);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   
   // --- UI Elements ---
@@ -1309,7 +1332,18 @@ document.addEventListener('DOMContentLoaded', () => {
     loaderPercent.textContent = '0%';
     loaderStatus.textContent = 'PREPARING MATRIX FRAMEWORKS...';
 
-    await delay(700);
+    await delay(400);
+
+    loaderProgressBar.style.width = '8%';
+    loaderPercent.textContent = '8%';
+    loaderStatus.textContent = 'LOADING BRAND ASSETS...';
+
+    const [loadedLogo, loadedLogoAlt] = await Promise.all([
+      loadImage('logo.png'),
+      loadImage('logo_alt.png')
+    ]);
+
+    await delay(300);
 
     loaderProgressBar.style.width = '15%';
     loaderPercent.textContent = '15%';
@@ -1425,13 +1459,22 @@ document.addEventListener('DOMContentLoaded', () => {
         octx.lineTo(marginX + frameW, marginY + frameH - 55);
         octx.stroke();
 
-        // 4. Branding text: monospace fonts (22px)
-        octx.font = "22px 'Share Tech Mono'";
-        octx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        // 4. Branding text & logos
+        // Draw vertical icon logo.png
+        if (loadedLogo) {
+          octx.drawImage(loadedLogo, marginX + 20, marginY + 10, 18, 36);
+        }
         
-        // Top Left: PROJECT BLEXX // SECURE
+        // Draw wordmark logo_alt.png (width: 64, height: 20) tinted white
+        if (loadedLogoAlt) {
+          drawTintedImage(octx, loadedLogoAlt, marginX + 48, marginY + 18, 64, 20, '#ffffff');
+        }
+        
+        // Draw secure status tag
+        octx.font = "22px 'Share Tech Mono'";
+        octx.fillStyle = 'rgba(255, 255, 255, 0.4)';
         octx.textAlign = 'left';
-        octx.fillText("PROJECT BLEXX // SECURE", marginX + 20, marginY + 35);
+        octx.fillText("// SECURE", marginX + 124, marginY + 35);
         
         // Top Right: HOUSE: [NAME]
         octx.textAlign = 'right';
