@@ -79,8 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Constants & Config ---
   const CANVAS_WIDTH = 500;
   const CANVAS_HEIGHT = 500;
-  const CENTER_X = CANVAS_WIDTH / 2;
-  const CENTER_Y = CANVAS_HEIGHT / 2;
+  let CENTER_X = CANVAS_WIDTH / 2;
+  let CENTER_Y = CANVAS_HEIGHT / 2;
 
   // --- Multi-House Architecture Profiles ---
   const HOUSE_CONFIG = {
@@ -1312,8 +1312,8 @@ document.addEventListener('DOMContentLoaded', () => {
     loaderStatus.textContent = 'CAPTURING GEOMETRIC CYCLES...';
 
     const offscreen = document.createElement('canvas');
-    offscreen.width = 400;
-    offscreen.height = 400;
+    offscreen.width = 1050;
+    offscreen.height = 750;
     const octx = offscreen.getContext('2d', { willReadFrequently: true });
     
     const frameImages = [];
@@ -1321,50 +1321,129 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const activeHouse = HOUSE_CONFIG[currentHouse];
 
-    for (let f = 0; f < numFrames; f++) {
-      clearCanvas(octx);
-      
-      const progress = f / numFrames;
-      const angle = progress * Math.PI * 2;
-      const scale = 0.90 + Math.sin(angle) * 0.05;
-      const mockTime = f * 3.5;
-      
-      // Draw dynamic pulses for the specific collapsed sigil in offscreen
-      drawHouseCoreSigil(octx, currentHouse, collapsedSigilIndex, scale, mockTime);
+    // Backup center coordinates
+    const originalCenterX = CENTER_X;
+    const originalCenterY = CENTER_Y;
 
-      // Glitch frame overlay for tech aesthetic
-      if (f === 5 || f === 12) {
-        octx.globalCompositeOperation = 'screen';
-        octx.fillStyle = `rgba(${currentHouse === 'chance' ? '0, 243, 255' : currentHouse === 'manifestation' ? '255, 183, 0' : '255, 0, 127'}, 0.45)`;
-        octx.fillRect(3, 0, 400, 400);
-        octx.fillStyle = 'rgba(255, 0, 85, 0.45)';
-        octx.fillRect(-3, 0, 400, 400);
-        octx.globalCompositeOperation = 'source-over';
+    // Shift centers for high-res offscreen canvas
+    CENTER_X = 525;
+    CENTER_Y = 375;
+
+    try {
+      for (let f = 0; f < numFrames; f++) {
+        // Clear full offscreen canvas
+        octx.fillStyle = '#050507';
+        octx.fillRect(0, 0, 1050, 750);
         
+        const progress = f / numFrames;
+        const angle = progress * Math.PI * 2;
+        const scale = 0.90 + Math.sin(angle) * 0.05;
+        const mockTime = f * 3.5;
+        
+        // Draw dynamic pulses for the specific collapsed sigil in offscreen
+        // scaled up for the 1050x750 canvas (1.625 factor)
+        drawHouseCoreSigil(octx, currentHouse, collapsedSigilIndex, scale * 1.625, mockTime);
+
+        // Glitch frame overlay for tech aesthetic (scaled for 1050x750)
+        if (f === 5 || f === 12) {
+          octx.globalCompositeOperation = 'screen';
+          octx.fillStyle = `rgba(${currentHouse === 'chance' ? '0, 243, 255' : currentHouse === 'manifestation' ? '255, 183, 0' : '255, 0, 127'}, 0.45)`;
+          octx.fillRect(8, 0, 1050, 750);
+          octx.fillStyle = 'rgba(255, 0, 85, 0.45)';
+          octx.fillRect(-8, 0, 1050, 750);
+          octx.globalCompositeOperation = 'source-over';
+          
+          octx.strokeStyle = activeHouse.colorGlow;
+          octx.lineWidth = 4;
+          octx.beginPath();
+          octx.moveTo(0, 450); octx.lineTo(1050, 450);
+          octx.moveTo(0, 650); octx.lineTo(1050, 650);
+          octx.stroke();
+        }
+
+        // Draw custom BLEXX-branded outer HUD frame (scaled by 2.5x)
+        const marginX = 30; // 12 * 2.5
+        const marginY = 30; // 12 * 2.5
+        const frameW = 1050 - 2 * marginX; // 990
+        const frameH = 750 - 2 * marginY; // 690
+        
+        // 1. Draw outer boundary with activeHouse.colorGlow (semi-transparent 20% opacity)
+        octx.strokeStyle = activeHouse.colorGlow + '33';
+        octx.lineWidth = 2.5;
+        octx.strokeRect(marginX, marginY, frameW, frameH);
+
+        // 2. Draw thick corner brackets (lineWidth = 5, activeHouse.colorGlow)
+        octx.lineWidth = 5;
         octx.strokeStyle = activeHouse.colorGlow;
-        octx.lineWidth = 1.5;
+        const bracketLen = 30; // 12 * 2.5
+        
+        // Top-Left corner
         octx.beginPath();
-        octx.moveTo(0, 180); octx.lineTo(400, 180);
-        octx.moveTo(0, 260); octx.lineTo(400, 260);
+        octx.moveTo(marginX, marginY + bracketLen);
+        octx.lineTo(marginX, marginY);
+        octx.lineTo(marginX + bracketLen, marginY);
         octx.stroke();
+        
+        // Top-Right corner
+        octx.beginPath();
+        octx.moveTo(marginX + frameW - bracketLen, marginY);
+        octx.lineTo(marginX + frameW, marginY);
+        octx.lineTo(marginX + frameW, marginY + bracketLen);
+        octx.stroke();
+        
+        // Bottom-Left corner
+        octx.beginPath();
+        octx.moveTo(marginX, marginY + frameH - bracketLen);
+        octx.lineTo(marginX, marginY + frameH);
+        octx.lineTo(marginX + bracketLen, marginY + frameH);
+        octx.stroke();
+        
+        // Bottom-Right corner
+        octx.beginPath();
+        octx.moveTo(marginX + frameW - bracketLen, marginY + frameH);
+        octx.lineTo(marginX + frameW, marginY + frameH);
+        octx.lineTo(marginX + frameW, marginY + frameH - bracketLen);
+        octx.stroke();
+
+        // 3. Draw thin horizontal dividers for header and footer
+        octx.lineWidth = 2.5;
+        octx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+        octx.beginPath();
+        octx.moveTo(marginX, marginY + 55); // marginY + 22 * 2.5 = 85
+        octx.lineTo(marginX + frameW, marginY + 55);
+        octx.moveTo(marginX, marginY + frameH - 55); // marginY + frameH - 22 * 2.5 = 665
+        octx.lineTo(marginX + frameW, marginY + frameH - 55);
+        octx.stroke();
+
+        // 4. Branding text: monospace fonts (22px)
+        octx.font = "22px 'Share Tech Mono'";
+        octx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        
+        // Top Left: PROJECT BLEXX // SECURE
+        octx.textAlign = 'left';
+        octx.fillText("PROJECT BLEXX // SECURE", marginX + 20, marginY + 35);
+        
+        // Top Right: HOUSE: [NAME]
+        octx.textAlign = 'right';
+        octx.fillStyle = activeHouse.colorGlow;
+        octx.fillText(`HOUSE: ${activeHouse.name.toUpperCase()}`, marginX + frameW - 20, marginY + 35);
+        
+        // Bottom Left: SIGIL: [NAME]
+        octx.textAlign = 'left';
+        octx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        octx.fillText(`SIGIL: ${activeHouse.sigilData[collapsedSigilIndex].name.toUpperCase()}`, marginX + 20, marginY + frameH - 20);
+        
+        // Bottom Right: [FULL FULFILLMENT CODE]
+        octx.textAlign = 'right';
+        octx.fillStyle = activeHouse.colorGlow;
+        octx.fillText(fullFulfillmentCode, marginX + frameW - 20, marginY + frameH - 20);
+        
+        frameImages.push(offscreen.toDataURL('image/png'));
       }
-
-      // Draw custom bounding frame
-      octx.strokeStyle = 'rgba(255,255,255,0.06)';
-      octx.lineWidth = 1;
-      octx.strokeRect(10, 10, 380, 380);
-
-      // Monospace label logs printed at the bottom of the GIF card
-      octx.fillStyle = 'rgba(255,255,255,0.2)';
-      octx.font = "8px 'Share Tech Mono'";
-      octx.textAlign = 'left';
-      octx.fillText(`DEC: BX-${activeHouse.name}-SECURE-STABLE`, 20, 380);
-      
-      octx.textAlign = 'right';
-      octx.fillStyle = activeHouse.colorGlow;
-      octx.fillText(fullFulfillmentCode, 380, 380);
-      
-      frameImages.push(offscreen.toDataURL('image/png'));
+    } finally {
+      // Always restore centers to original states
+      CENTER_X = originalCenterX;
+      CENTER_Y = originalCenterY;
     }
 
     await delay(800);
@@ -1379,8 +1458,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     gifshot.createGIF({
       images: frameImages,
-      gifWidth: 400,
-      gifHeight: 400,
+      gifWidth: 1050,
+      gifHeight: 750,
       interval: 0.1, // 100ms per frame
       progressCallback: (progressPercent) => {
         const computedPercent = Math.min(90, Math.round(35 + progressPercent * 55));
